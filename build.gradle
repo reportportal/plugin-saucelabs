@@ -1,18 +1,4 @@
-plugins {
-    id 'org.springframework.boot' version '2.1.3.RELEASE'
-    id 'java'
-}
-
-apply plugin: 'io.spring.dependency-management'
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-repositories {
-    mavenCentral()
-    maven { url "http://dl.bintray.com/epam/reportportal" }
-    maven { url "https://jitpack.io" }
-}
+apply plugin: 'java'
 
 project.ext {
     releaseMode = project.hasProperty("releaseMode")
@@ -20,15 +6,56 @@ project.ext {
     pluginsDir = "$buildDir/plugins"
 }
 
+repositories {
+    mavenCentral()
+    maven { url "http://dl.bintray.com/epam/reportportal" }
+
+    if (!releaseMode) {
+        maven { url 'https://jitpack.io' }
+    }
+}
+
 dependencies {
 
     if (releaseMode) {
-        implementation('com.github.reportportal:plugin-api:eaa2a346')
+        compile 'com.github.reportportal:plugin-api:6337596a'
     } else {
-        implementation('com.github.reportportal:plugin-api:eaa2a346')
+        compile 'com.github.reportportal:plugin-api:6337596a'
     }
 
-    implementation 'com.saucelabs:saucerest:1.0.40'
-    implementation 'org.springframework.boot:spring-boot-starter'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    compile 'com.saucelabs:saucerest:1.0.40'
+}
+
+
+jar {
+    manifest {
+        attributes(
+                "Class-Path": configurations.compile.collect { it.getName() }.join(' '),
+                "Plugin-Id": "${pluginID}",
+                "Plugin-Version": "${project.version}",
+                "Plugin-Provider": "Andrei Varabyeu",
+                "Plugin-Class": "com.epam.reportportal.saucelabs.SaucelabsPlugin",
+//                "Plugin-Dependencies": ""
+        )
+    }
+}
+
+task plugin(type: Jar) {
+    baseName = "plugin-${pluginID}"
+    into('classes') {
+        with jar
+    }
+    into('lib') {
+        from configurations.compile
+    }
+    extension('zip')
+}
+
+task assemblePlugin(type: Copy) {
+    from plugin
+    into pluginsDir
+}
+
+task assemblePlugins(type: Copy) {
+    dependsOn subprojects.assemblePlugin
 }

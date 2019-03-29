@@ -22,6 +22,8 @@ import com.epam.ta.reportportal.exception.ReportPortalException;
 import com.epam.ta.reportportal.ws.model.ErrorType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saucelabs.saucerest.SauceREST;
+import org.pf4j.Extension;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +31,8 @@ import java.io.InputStream;
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
+@Extension
+@Component
 public class SaucelabsExtension implements SaucelabsExtensionPoint {
 
 	private ObjectMapper objectMapper = new ObjectMapper();
