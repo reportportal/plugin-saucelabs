@@ -6,6 +6,8 @@ project.ext {
     pluginsDir = "$buildDir/plugins"
 }
 
+version = '1.0.0'
+
 repositories {
     mavenCentral()
     maven { url "http://dl.bintray.com/epam/reportportal" }
@@ -18,9 +20,9 @@ repositories {
 dependencies {
 
     if (releaseMode) {
-        compile 'com.github.reportportal:plugin-api:6337596a'
+        compile 'com.github.reportportal:plugin-api:eed3a963'
     } else {
-        compile 'com.github.reportportal:plugin-api:6337596a'
+        compile 'com.github.reportportal:plugin-api:eed3a963'
     }
 
     compile 'com.saucelabs:saucerest:1.0.40'
@@ -33,7 +35,7 @@ jar {
                 "Class-Path": configurations.compile.collect { it.getName() }.join(' '),
                 "Plugin-Id": "${pluginID}",
                 "Plugin-Version": "${project.version}",
-                "Plugin-Provider": "Andrei Varabyeu",
+                "Plugin-Provider": "Pavel Bortnik",
                 "Plugin-Class": "com.epam.reportportal.saucelabs.SaucelabsPlugin",
 //                "Plugin-Dependencies": ""
         )

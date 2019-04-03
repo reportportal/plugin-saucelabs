@@ -16,55 +16,37 @@
 
 package com.epam.reportportal.saucelabs;
 
-import com.epam.reportportal.extension.saucelabs.SaucelabsExtensionPoint;
-import com.epam.ta.reportportal.entity.integration.Integration;
-import com.epam.ta.reportportal.exception.ReportPortalException;
-import com.epam.ta.reportportal.ws.model.ErrorType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.saucelabs.saucerest.SauceREST;
+import com.epam.reportportal.extension.PluginCommand;
+import com.epam.reportportal.extension.ReportPortalExtensionPoint;
+import com.google.common.collect.ImmutableMap;
 import org.pf4j.Extension;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
 @Extension
 @Component
-public class SaucelabsExtension implements SaucelabsExtensionPoint {
+public class SaucelabsExtension implements ReportPortalExtensionPoint {
 
-	private ObjectMapper objectMapper = new ObjectMapper();
+	private static final Map<String, PluginCommand> MAPPING = ImmutableMap.<String, PluginCommand>builder().put("logs",
+			new GetLogsCommand()
+	).put("jobInfo", new JobInfoCommand()).put("test", new TestCommand()).build();
+
+	static final String DATA_CENTER = "dataCenter";
+	static final String JOB_ID = "jobId";
 
 	@Override
-	public InputStream downloadVideo(Integration system, String jobId, String dataCenter) {
-		SauceREST sauce = RestClient.buildSauceClient(system, dataCenter);
-		try {
-			return sauce.downloadVideo(jobId);
-		} catch (IOException e) {
-			throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, e.getMessage());
-		}
+	public List<String> getCommandNames() {
+		return new ArrayList<>(MAPPING.keySet());
 	}
 
 	@Override
-	public Object getLogs(Integration system, String jobId, String dataCenter) {
-		SauceREST sauce = RestClient.buildSauceClient(system, dataCenter);
-		try {
-			return objectMapper.readValue(sauce.retrieveResults(sauce.getUsername() + "/jobs/" + jobId + "assets/log.json"), Object.class);
-		} catch (IOException e) {
-			throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, e.getMessage());
-		}
+	public PluginCommand getCommandToExecute(String commandName) {
+		return MAPPING.get(commandName);
 	}
-
-	@Override
-	public Object getJobInfo(Integration system, String jobId, String dataCenter) {
-		SauceREST sauce = RestClient.buildSauceClient(system, dataCenter);
-		try {
-			return objectMapper.readValue(sauce.getJobInfo(jobId), Object.class);
-		} catch (IOException e) {
-			throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, e.getMessage());
-		}
-	}
-
 }
