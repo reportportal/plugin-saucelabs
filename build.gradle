@@ -20,9 +20,9 @@ repositories {
 dependencies {
 
     if (releaseMode) {
-        compile 'com.github.reportportal:plugin-api:eed3a963'
+        compile 'com.github.reportportal:plugin-api:30f47d49'
     } else {
-        compile 'com.github.reportportal:plugin-api:eed3a963'
+        compile 'com.github.reportportal:plugin-api:30f47d49'
     }
 
     compile 'com.saucelabs:saucerest:1.0.40'
