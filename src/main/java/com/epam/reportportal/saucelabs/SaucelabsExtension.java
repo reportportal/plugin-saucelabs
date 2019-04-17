@@ -35,7 +35,11 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
 
 	private static final Map<String, PluginCommand> MAPPING = ImmutableMap.<String, PluginCommand>builder().put("logs",
 			new GetLogsCommand()
-	).put("jobInfo", new JobInfoCommand()).put("test", new TestCommand()).build();
+	)
+			.put("jobInfo", new JobInfoCommand())
+			.put("test", new TestCommand())
+			.put("assets", new AssetsCommand())
+			.build();
 
 	static final String DATA_CENTER = "dataCenter";
 	static final String JOB_ID = "jobId";
