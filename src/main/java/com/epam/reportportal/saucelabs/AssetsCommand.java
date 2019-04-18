@@ -21,7 +21,7 @@ public class AssetsCommand implements PluginCommand<Object> {
 	@Override
 	public Object executeCommand(Integration integration, Map<String, Object> params) {
 		SauceREST sauce = RestClient.buildSauceClient(integration, (String) params.get(DATA_CENTER));
-		String assetsPrefix = sauce.getServer().replaceFirst("https://", "https://assets.") + "jobs/" + params.get(JOB_ID) + "/";
+		String assetsPrefix = sauce.getAppServer() + "rest/v1/" + sauce.getUsername() + "/jobs/" + params.get(JOB_ID) + "/assets/";
 		try {
 			Map<String, String> result = new ObjectMapper().readValue(sauce.retrieveResults(
 					sauce.getUsername() + "/jobs/" + params.get(JOB_ID) + "/assets"), Map.class);
