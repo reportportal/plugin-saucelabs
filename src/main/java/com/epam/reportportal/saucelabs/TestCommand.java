@@ -16,7 +16,7 @@ public class TestCommand implements com.epam.reportportal.extension.PluginComman
 	@Override
 	public Boolean executeCommand(Integration integration, Map params) {
 		SauceREST sauce = RestClient.buildSauceClient(integration, (String) params.get(DATA_CENTER));
-		String username = sauce.getUsername();
+		String username = sauce.getUser();
 		return StringUtils.isNotEmpty(username);
 	}
 }
