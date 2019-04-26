@@ -20,6 +20,7 @@ public class AssetsCommand implements PluginCommand<Object> {
 
 	@Override
 	public Object executeCommand(Integration integration, Map<String, Object> params) {
+		ValidationUtils.validateParams(params);
 		SauceREST sauce = RestClient.buildSauceClient(integration, (String) params.get(DATA_CENTER));
 		String assetsPrefix = sauce.getAppServer() + "rest/v1/" + sauce.getUsername() + "/jobs/" + params.get(JOB_ID) + "/assets/";
 		try {

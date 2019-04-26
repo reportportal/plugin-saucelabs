@@ -20,6 +20,7 @@ public class GetLogsCommand implements PluginCommand<Object> {
 
 	@Override
 	public Object executeCommand(Integration system, Map<String, Object> params) {
+		ValidationUtils.validateParams(params);
 		SauceREST sauce = RestClient.buildSauceClient(system, (String) params.get(DATA_CENTER));
 		try {
 			return new ObjectMapper().readValue(sauce.retrieveResults(

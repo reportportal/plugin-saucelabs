@@ -22,6 +22,7 @@ import com.epam.ta.reportportal.exception.ReportPortalException;
 import com.epam.ta.reportportal.ws.model.ErrorType;
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.SauceREST;
+import org.apache.commons.lang3.StringUtils;
 
 import static com.epam.reportportal.saucelabs.SaucelabsProperties.ACCESS_TOKEN;
 import static com.epam.reportportal.saucelabs.SaucelabsProperties.USERNAME;
@@ -40,7 +41,14 @@ public class RestClient {
 				.orElseThrow(() -> new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, "Username is not specified."));
 		String accessToken = ACCESS_TOKEN.getParam(params)
 				.orElseThrow(() -> new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, "Access token is not specified."));
-		return new SauceREST(username, accessToken, DataCenter.fromString(dataCenter));
+
+		SauceREST sauceREST = new SauceREST(username, accessToken, DataCenter.fromString(dataCenter));
+
+		if (StringUtils.isEmpty(sauceREST.getUser())) {
+			throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, "Incorrect Username or Access token");
+		}
+
+		return sauceREST;
 	}
 
 }

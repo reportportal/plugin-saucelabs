@@ -19,6 +19,7 @@ public class JobInfoCommand implements com.epam.reportportal.extension.PluginCom
 
 	@Override
 	public Object executeCommand(Integration integration, Map params) {
+		ValidationUtils.validateParams(params);
 		SauceREST sauce = RestClient.buildSauceClient(integration, (String) params.get(DATA_CENTER));
 		try {
 			return new ObjectMapper().readValue(sauce.getJobInfo((String) params.get(JOB_ID)), Object.class);
