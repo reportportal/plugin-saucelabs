@@ -16,9 +16,12 @@ public class ValidationUtils {
 
 	public static void validateParams(Map params) {
 		expect(params.get(DATA_CENTER), Predicates.notNull()).verify(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
-				"Data center should be provided"
+				DATA_CENTER + " parameter should be provided"
 		);
-		expect(params.get(JOB_ID), Predicates.notNull()).verify(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, "Job id should be provided");
+		expect(params.get(JOB_ID), Predicates.notNull()).verify(
+				ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
+				JOB_ID + " parameter should be provided"
+		);
 	}
 
 }
