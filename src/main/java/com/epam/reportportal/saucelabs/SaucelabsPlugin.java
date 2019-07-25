@@ -28,7 +28,7 @@ public class SaucelabsPlugin extends Plugin {
 	 * Your plugins have to provide constructor with this exact signature to
 	 * be successfully loaded by manager.
 	 *
-	 * @param wrapper
+	 * @param wrapper PF4J plugin wrapper
 	 */
 	public SaucelabsPlugin(PluginWrapper wrapper) {
 		super(wrapper);
