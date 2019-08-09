@@ -37,7 +37,7 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
 			new GetLogsCommand()
 	)
 			.put("jobInfo", new JobInfoCommand())
-			.put("test", new TestCommand())
+			.put("testConnection", new TestCommand())
 			.put("assets", new AssetsCommand())
 			.build();
 
