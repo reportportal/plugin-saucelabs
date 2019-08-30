@@ -13,8 +13,6 @@ project.ext {
     pluginsDir = "$buildDir/plugins"
 }
 
-version = '1.0.9'
-
 repositories {
     mavenCentral()
     maven { url "http://dl.bintray.com/epam/reportportal" }
