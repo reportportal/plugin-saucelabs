@@ -39,6 +39,7 @@ jar {
                 "Plugin-Version": "${project.version}",
                 "Plugin-Provider": "Pavel Bortnik",
                 "Plugin-Class": "com.epam.reportportal.saucelabs.SaucelabsPlugin",
+                "Plugin-Service": "api"
 //                "Plugin-Dependencies": ""
         )
     }
