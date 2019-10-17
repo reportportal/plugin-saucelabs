@@ -41,7 +41,6 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
 			.put("assets", new AssetsCommand())
 			.build();
 
-	static final String DATA_CENTER = "dataCenter";
 	static final String JOB_ID = "jobId";
 
 	@Override

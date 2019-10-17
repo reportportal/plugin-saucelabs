@@ -26,7 +26,8 @@ import java.util.Optional;
 public enum SaucelabsProperties {
 
 	USERNAME("username"),
-	ACCESS_TOKEN("accessToken");
+	ACCESS_TOKEN("accessToken"),
+	DATA_CENTER("dataCenter");
 
 	private final String name;
 

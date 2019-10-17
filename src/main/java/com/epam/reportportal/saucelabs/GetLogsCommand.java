@@ -17,16 +17,17 @@
 package com.epam.reportportal.saucelabs;
 
 import com.epam.reportportal.extension.PluginCommand;
+import com.epam.ta.reportportal.commons.validation.Suppliers;
 import com.epam.ta.reportportal.entity.integration.Integration;
 import com.epam.ta.reportportal.exception.ReportPortalException;
 import com.epam.ta.reportportal.ws.model.ErrorType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saucelabs.saucerest.SauceREST;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.Map;
 
-import static com.epam.reportportal.saucelabs.SaucelabsExtension.DATA_CENTER;
 import static com.epam.reportportal.saucelabs.SaucelabsExtension.JOB_ID;
 
 /**
@@ -37,10 +38,16 @@ public class GetLogsCommand implements PluginCommand<Object> {
 	@Override
 	public Object executeCommand(Integration system, Map<String, Object> params) {
 		ValidationUtils.validateParams(params);
-		SauceREST sauce = RestClient.buildSauceClient(system, (String) params.get(DATA_CENTER));
+		SauceREST sauce = RestClient.buildSauceClient(system);
 		try {
-			return new ObjectMapper().readValue(sauce.retrieveResults(
-					sauce.getUsername() + "/jobs/" + params.get(JOB_ID) + "/assets/log.json"), Object.class);
+			String jobId = (String) params.get(JOB_ID);
+			String content = sauce.retrieveResults(sauce.getUsername() + "/jobs/" + jobId + "/assets/log.json");
+			if (StringUtils.isEmpty(content)) {
+				throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
+						Suppliers.formattedSupplier("Job '{}' not found.", jobId)
+				);
+			}
+			return new ObjectMapper().readValue(content, Object.class);
 		} catch (IOException e) {
 			throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, e.getMessage());
 		}
