@@ -35,6 +35,10 @@ public enum SaucelabsProperties {
 		this.name = name;
 	}
 
+	public String getName() {
+		return name;
+	}
+
 	public Optional<String> getParam(IntegrationParams params) {
 		return Optional.ofNullable(params.getParams().get(this.name)).map(String::valueOf);
 	}

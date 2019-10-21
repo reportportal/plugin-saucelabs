@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import static com.epam.reportportal.saucelabs.SaucelabsExtension.JOB_ID;
+import static com.epam.reportportal.saucelabs.SaucelabsProperties.DATA_CENTER;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
@@ -38,7 +39,7 @@ public class GetLogsCommand implements PluginCommand<Object> {
 	@Override
 	public Object executeCommand(Integration system, Map<String, Object> params) {
 		ValidationUtils.validateParams(params);
-		SauceREST sauce = RestClient.buildSauceClient(system);
+		SauceREST sauce = RestClient.buildSauceClient(system, (String) params.get(DATA_CENTER.getName()));
 		try {
 			String jobId = (String) params.get(JOB_ID);
 			String content = sauce.retrieveResults(sauce.getUsername() + "/jobs/" + jobId + "/assets/log.json");
