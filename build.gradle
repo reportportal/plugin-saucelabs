@@ -24,10 +24,10 @@ dependencies {
         implementation 'com.epam.reportportal:plugin-api:5.0.0-BETA-6'
         annotationProcessor 'com.epam.reportportal:plugin-api:5.0.0-BETA-6'
     } else {
-        implementation 'com.github.reportportal:plugin-api:a60d458'
-        annotationProcessor 'com.github.reportportal:plugin-api:a60d458'
+        implementation 'com.github.reportportal:plugin-api:0ed8e231'
+        annotationProcessor 'com.github.reportportal:plugin-api:0ed8e231'
     }
-    compile 'com.saucelabs:saucerest:1.0.40'
+    compile 'com.saucelabs:saucerest:1.0.43'
 }
 
 
