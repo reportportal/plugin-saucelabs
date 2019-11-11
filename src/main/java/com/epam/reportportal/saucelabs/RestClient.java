@@ -32,7 +32,7 @@ import static java.util.Optional.ofNullable;
  */
 public class RestClient {
 
-	public static SauceREST buildSauceClient(Integration system) {
+	public static SauceREST buildSauceClient(Integration system, String dataCenter) {
 		IntegrationParams params = ofNullable(system.getParams()).orElseThrow(() -> new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
 				"Integration params are not specified."
 		));
@@ -40,10 +40,10 @@ public class RestClient {
 				.orElseThrow(() -> new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, "Username is not specified."));
 		String accessToken = ACCESS_TOKEN.getParam(params)
 				.orElseThrow(() -> new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, "Access token is not specified."));
-		String dataCenter = DATA_CENTER.getParam(params)
-				.orElseThrow(() -> new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, "Data center is not specified."));
+		String dc = ofNullable(dataCenter).orElse(DATA_CENTER.getParam(params)
+				.orElseThrow(() -> new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, "Data center is not specified.")));
 
-		SauceREST sauceREST = new SauceREST(username, accessToken, DataCenter.fromString(dataCenter));
+		SauceREST sauceREST = new SauceREST(username, accessToken, DataCenter.fromString(dc));
 
 		if (StringUtils.isEmpty(sauceREST.getUser())) {
 			throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, "Incorrect Username or Access token");
