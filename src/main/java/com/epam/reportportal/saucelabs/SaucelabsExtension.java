@@ -49,7 +49,7 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
 	@Override
 	public Map<String, ?> getPluginParams() {
 		Map<String, Object> params = new HashMap<>();
-		params.put("allowedCommands", new ArrayList<>(MAPPING.keySet()));
+		params.put(ALLOWED_COMMANDS, new ArrayList<>(MAPPING.keySet()));
 		params.put("dataCenters", Arrays.stream(DataCenter.values()).map(Enum::toString).collect(Collectors.toList()));
 		return params;
 	}
