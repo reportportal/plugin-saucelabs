@@ -8,8 +8,8 @@ plugins {
 apply from: 'build-quality.gradle'
 apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/master/release-fat.gradle'
 
-sourceCompatibility = 8
-targetCompatibility = 8
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 project.ext {
     releaseMode = project.hasProperty("releaseMode")
@@ -25,11 +25,11 @@ repositories {
 
 dependencies {
     if (releaseMode) {
-        implementation 'com.epam.reportportal:plugin-api:5.0.0-BETA-6'
-        annotationProcessor 'com.epam.reportportal:plugin-api:5.0.0-BETA-6'
+        implementation 'com.epam.reportportal:plugin-api:5.0.0-RC-2'
+        annotationProcessor 'com.epam.reportportal:plugin-api:5.0.0-RC-2'
     } else {
-        implementation 'com.github.reportportal:plugin-api:0ed8e231'
-        annotationProcessor 'com.github.reportportal:plugin-api:0ed8e231'
+        implementation 'com.epam.reportportal:plugin-api:5.0.0-RC-2'
+        annotationProcessor 'com.epam.reportportal:plugin-api:5.0.0-RC-2'
     }
     implementation 'com.saucelabs:saucerest:1.0.43'
 }
