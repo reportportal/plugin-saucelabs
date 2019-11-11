@@ -19,12 +19,15 @@ package com.epam.reportportal.saucelabs;
 import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.extension.ReportPortalExtensionPoint;
 import com.google.common.collect.ImmutableMap;
+import com.saucelabs.saucerest.DataCenter;
 import org.pf4j.Extension;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
@@ -44,8 +47,11 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
 	static final String JOB_ID = "jobId";
 
 	@Override
-	public List<String> getCommandNames() {
-		return new ArrayList<>(MAPPING.keySet());
+	public Map<String, ?> getPluginParams() {
+		Map<String, Object> params = new HashMap<>();
+		params.put("allowedCommands", new ArrayList<>(MAPPING.keySet()));
+		params.put("dataCenters", Arrays.stream(DataCenter.values()).map(Enum::toString).collect(Collectors.toList()));
+		return params;
 	}
 
 	@Override

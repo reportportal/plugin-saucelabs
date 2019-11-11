@@ -1,11 +1,15 @@
 plugins {
     id 'net.researchgate.release' version '2.8.0'
     id "com.jfrog.bintray" version "1.8.4"
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
 }
 
-apply plugin: 'java'
 apply from: 'build-quality.gradle'
-apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/master/release-commons.gradle'
+apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/master/release-fat.gradle'
+
+sourceCompatibility = 8
+targetCompatibility = 8
 
 project.ext {
     releaseMode = project.hasProperty("releaseMode")
@@ -24,10 +28,10 @@ dependencies {
         implementation 'com.epam.reportportal:plugin-api:5.0.0-BETA-6'
         annotationProcessor 'com.epam.reportportal:plugin-api:5.0.0-BETA-6'
     } else {
-        implementation 'com.github.reportportal:plugin-api:a60d458'
-        annotationProcessor 'com.github.reportportal:plugin-api:a60d458'
+        implementation 'com.github.reportportal:plugin-api:0ed8e231'
+        annotationProcessor 'com.github.reportportal:plugin-api:0ed8e231'
     }
-    compile 'com.saucelabs:saucerest:1.0.40'
+    implementation 'com.saucelabs:saucerest:1.0.43'
 }
 
 
@@ -41,6 +45,13 @@ jar {
                 "Plugin-Class": "com.epam.reportportal.saucelabs.SaucelabsPlugin",
 //                "Plugin-Dependencies": ""
         )
+    }
+}
+
+shadowJar {
+    zip64 true
+    dependencies {
+        include(dependency('com.saucelabs:saucerest:1.0.43'))
     }
 }
 
