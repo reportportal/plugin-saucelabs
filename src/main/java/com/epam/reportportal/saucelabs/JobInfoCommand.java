@@ -16,6 +16,7 @@
 
 package com.epam.reportportal.saucelabs;
 
+import com.epam.reportportal.extension.PluginCommand;
 import com.epam.ta.reportportal.commons.validation.Suppliers;
 import com.epam.ta.reportportal.entity.integration.Integration;
 import com.epam.ta.reportportal.exception.ReportPortalException;
@@ -32,7 +33,7 @@ import static com.epam.reportportal.saucelabs.SaucelabsExtension.JOB_ID;
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
-public class JobInfoCommand implements com.epam.reportportal.extension.PluginCommand {
+public class JobInfoCommand implements PluginCommand {
 
 	@Override
 	public Object executeCommand(Integration integration, Map params) {
