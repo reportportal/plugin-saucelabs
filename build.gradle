@@ -52,6 +52,7 @@ shadowJar {
     zip64 true
     dependencies {
         include(dependency('com.saucelabs:saucerest:1.0.43'))
+        include(dependency('org.json:json:20171018'))
     }
 }
 
