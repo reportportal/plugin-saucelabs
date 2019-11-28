@@ -42,6 +42,7 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
 			.put("jobInfo", new JobInfoCommand())
 			.put("testConnection", new TestCommand())
 			.put("assets", new AssetsCommand())
+			.put("token", new GenerateAuthTokenCommand())
 			.build();
 
 	static final String JOB_ID = "jobId";

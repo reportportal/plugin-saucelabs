@@ -25,7 +25,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saucelabs.saucerest.SauceREST;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
+import java.security.Key;
 import java.util.Map;
 
 import static com.epam.reportportal.saucelabs.SaucelabsExtension.JOB_ID;
