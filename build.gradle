@@ -5,7 +5,7 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '5.2.0'
 }
 
-apply from: 'build-quality.gradle'
+apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/master/build-quality.gradle'
 apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/master/release-fat.gradle'
 
 sourceCompatibility = 1.8
@@ -25,11 +25,11 @@ repositories {
 
 dependencies {
     if (releaseMode) {
-        implementation 'com.epam.reportportal:plugin-api:5.0.0-RC-2'
-        annotationProcessor 'com.epam.reportportal:plugin-api:5.0.0-RC-2'
+        implementation 'com.epam.reportportal:plugin-api:5.0.0-RC-5'
+        annotationProcessor 'com.epam.reportportal:plugin-api:5.0.0-RC-5'
     } else {
-        implementation 'com.epam.reportportal:plugin-api:5.0.0-RC-2'
-        annotationProcessor 'com.epam.reportportal:plugin-api:5.0.0-RC-2'
+        implementation 'com.epam.reportportal:plugin-api:5.0.0-RC-5'
+        annotationProcessor 'com.epam.reportportal:plugin-api:5.0.0-RC-5'
     }
     implementation 'com.saucelabs:saucerest:1.0.43'
 }
