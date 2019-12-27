@@ -20,10 +20,20 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
+dependencyManagement {
+    imports {
+        if (releaseMode) {
+            mavenBom "com.epam.reportportal:commons-bom:5.0.0-RC-5"
+        } else {
+            mavenBom "com.github.reportportal:commons-bom:4b7ed8a"
+        }
+    }
+}
+
 dependencies {
     if (releaseMode) {
-        implementation 'com.epam.reportportal:plugin-api:5.0.0-RC-5'
-        annotationProcessor 'com.epam.reportportal:plugin-api:5.0.0-RC-5'
+        implementation 'com.epam.reportportal:plugin-api'
+        annotationProcessor 'com.epam.reportportal:plugin-api'
     } else {
         implementation 'com.epam.reportportal:plugin-api:5.0.0-RC-5'
         annotationProcessor 'com.epam.reportportal:plugin-api:5.0.0-RC-5'
