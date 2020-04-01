@@ -3,6 +3,12 @@ plugins {
     id 'java'
 }
 
+project.ext {
+    releaseMode = project.hasProperty("releaseMode")
+    pluginID = "saucelabs"
+    pluginsDir = "$buildDir/plugins"
+}
+
 def scriptsUrl = 'https://raw.githubusercontent.com/reportportal/gradle-scripts/' +
         (releaseMode ? getProperty('scripts.version') : 'develop')
 
@@ -11,12 +17,6 @@ apply from: scriptsUrl + '/build-quality.gradle'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
-
-project.ext {
-    releaseMode = project.hasProperty("releaseMode")
-    pluginID = "saucelabs"
-    pluginsDir = "$buildDir/plugins"
-}
 
 repositories {
     mavenCentral()
