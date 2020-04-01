@@ -3,8 +3,11 @@ plugins {
     id 'java'
 }
 
-apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/5.0.0/build-quality.gradle'
-apply from: 'https://raw.githubusercontent.com/reportportal/gradle-scripts/5.0.0/release-fat.gradle'
+def scriptsUrl = 'https://raw.githubusercontent.com/reportportal/gradle-scripts/' +
+        (releaseMode ? getProperty('scripts.version') : 'develop')
+
+apply from: scriptsUrl + '/release-fat.gradle'
+apply from: scriptsUrl + '/build-quality.gradle'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -22,7 +25,7 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom(releaseMode ? 'com.epam.reportportal:commons-bom:5.0.0' : 'com.github.reportportal:commons-bom:4b7ed8a')
+        mavenBom(releaseMode ? 'com.epam.reportportal:commons-bom:' + getProperty('bom.version') : 'com.github.reportportal:commons-bom:4b7ed8a')
     }
 }
 
