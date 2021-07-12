@@ -4,6 +4,8 @@ plugins {
 }
 
 project.ext {
+    publishRepo = "https://maven.pkg.github.com/reportportal/plugin-saucelabs"
+    dependencyRepos = ["plugin-api", "commons-bom"]
     releaseMode = project.hasProperty("releaseMode")
     pluginID = "saucelabs"
     pluginsDir = "$buildDir/plugins"
@@ -13,6 +15,7 @@ def scriptsUrl = 'https://raw.githubusercontent.com/reportportal/gradle-scripts/
         (releaseMode ? getProperty('scripts.version') : 'develop')
 
 apply from: scriptsUrl + '/release-fat.gradle'
+apply from: scriptsUrl + '/signing.gradle'
 apply from: scriptsUrl + '/build-quality.gradle'
 
 sourceCompatibility = JavaVersion.VERSION_11
@@ -20,7 +23,20 @@ targetCompatibility = JavaVersion.VERSION_11
 
 repositories {
     mavenCentral()
-    releaseMode ? maven { url "http://dl.bintray.com/epam/reportportal" } : maven { url 'https://jitpack.io' }
+    maven { url "https://m2proxy.atlassian.com/repository/public" }
+    if (releaseMode) {
+        dependencyRepos.forEach { path ->
+            maven {
+                setUrl("https://maven.pkg.github.com/reportportal/${path}")
+                credentials {
+                    username = findProperty("githubUserName")
+                    password = findProperty("githubToken")
+                }
+            }
+        }
+    } else {
+        maven { url 'https://jitpack.io' }
+    }
 }
 
 dependencyManagement {
@@ -40,6 +56,7 @@ dependencies {
     implementation 'com.saucelabs:saucerest:1.0.43'
 }
 
+generatePomFileForShadowPublication { pom.packaging = "jar" }
 
 jar {
     manifest {
