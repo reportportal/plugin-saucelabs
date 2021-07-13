@@ -58,6 +58,7 @@ dependencies {
 
 generatePomFileForShadowPublication { pom.packaging = "jar" }
 
+
 jar {
     manifest {
         attributes(
