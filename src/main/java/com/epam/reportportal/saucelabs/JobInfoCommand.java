@@ -41,10 +41,16 @@ import static com.epam.reportportal.saucelabs.SaucelabsProperties.DATA_CENTER;
  */
 public class JobInfoCommand implements PluginCommand {
 
+	private final RestClient restClient;
+
+	public JobInfoCommand(RestClient restClient) {
+		this.restClient = restClient;
+	}
+
 	@Override
 	public Object executeCommand(Integration integration, Map params) {
 		ValidationUtils.validateParams(params);
-		SauceREST sauce = RestClient.buildSauceClient(integration, (String) params.get(DATA_CENTER.getName()));
+		SauceREST sauce = restClient.buildSauceClient(integration, (String) params.get(DATA_CENTER.getName()));
 		try {
 			String jobId = (String) params.get(JOB_ID);
 			String jobInfo = sauce.getJobInfo(jobId);

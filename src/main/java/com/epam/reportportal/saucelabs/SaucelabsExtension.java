@@ -20,43 +20,60 @@ import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.extension.ReportPortalExtensionPoint;
 import com.google.common.collect.ImmutableMap;
 import com.saucelabs.saucerest.DataCenter;
+import org.jasypt.util.text.BasicTextEncryptor;
 import org.pf4j.Extension;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
 @Extension
-@Component
 public class SaucelabsExtension implements ReportPortalExtensionPoint {
 
-	private static final Map<String, PluginCommand> MAPPING = ImmutableMap.<String, PluginCommand>builder().put("logs",
-			new GetLogsCommand()
-	)
-			.put("jobInfo", new JobInfoCommand())
-			.put("testConnection", new TestCommand())
-			.put("assets", new AssetsCommand())
-			.put("token", new GenerateAuthTokenCommand())
-			.build();
-
 	static final String JOB_ID = "jobId";
+
+	private final Supplier<Map<String, PluginCommand<?>>> pluginCommandMapping = new MemoizingSupplier<>(this::getCommands);
+
+	private final Supplier<RestClient> restClientSupplier;
+
+	@Autowired
+	private BasicTextEncryptor simpleEncryptor;
+
+	public SaucelabsExtension() {
+		restClientSupplier = new MemoizingSupplier<>(() -> new RestClient(simpleEncryptor));
+	}
+
 
 	@Override
 	public Map<String, ?> getPluginParams() {
 		Map<String, Object> params = new HashMap<>();
-		params.put(ALLOWED_COMMANDS, new ArrayList<>(MAPPING.keySet()));
+		params.put(ALLOWED_COMMANDS, new ArrayList<>(pluginCommandMapping.get().keySet()));
 		params.put("dataCenters", Arrays.stream(DataCenter.values()).map(Enum::toString).collect(Collectors.toList()));
 		return params;
 	}
 
 	@Override
-	public PluginCommand getCommandToExecute(String commandName) {
-		return MAPPING.get(commandName);
+	public PluginCommand<?> getCommandToExecute(String commandName) {
+		return pluginCommandMapping.get().get(commandName);
+	}
+
+	private Map<String, PluginCommand<?>> getCommands() {
+		return ImmutableMap.<String, PluginCommand<?>>builder().put("logs", new GetLogsCommand(restClientSupplier.get()))
+				.put("jobInfo", new JobInfoCommand(restClientSupplier.get()))
+				.put("testConnection", new TestConnectionCommand(restClientSupplier.get()))
+				.put("assets", new AssetsCommand(restClientSupplier.get()))
+				.put("token", new GenerateAuthTokenCommand(simpleEncryptor))
+				.build();
+
 	}
 }
