@@ -53,4 +53,9 @@ public class GetLogsCommand implements PluginCommand<Object> {
 			throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, e.getMessage());
 		}
 	}
+
+	@Override
+	public String getName() {
+		return "logs";
+	}
 }

@@ -16,6 +16,7 @@
 
 package com.epam.reportportal.saucelabs;
 
+import com.epam.reportportal.extension.CommonPluginCommand;
 import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.extension.ReportPortalExtensionPoint;
 import com.google.common.collect.ImmutableMap;
@@ -23,10 +24,7 @@ import com.saucelabs.saucerest.DataCenter;
 import org.pf4j.Extension;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -56,7 +54,12 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
 	}
 
 	@Override
-	public PluginCommand getCommandToExecute(String commandName) {
+	public CommonPluginCommand getCommonCommand(String commandName) {
+		throw new UnsupportedOperationException("Plugin commands are not supported");
+	}
+
+	@Override
+	public PluginCommand getIntegrationCommand(String commandName) {
 		return MAPPING.get(commandName);
 	}
 }
