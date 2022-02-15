@@ -50,8 +50,8 @@ dependencies {
         implementation 'com.epam.reportportal:plugin-api'
         annotationProcessor 'com.epam.reportportal:plugin-api'
     } else {
-        implementation 'com.github.reportportal:plugin-api:5.0.0-RC-5'
-        annotationProcessor 'com.github.reportportal:plugin-api:5.0.0-RC-5'
+        implementation 'com.github.reportportal:plugin-api:886ac55'
+        annotationProcessor 'com.github.reportportal:plugin-api:886ac55'
     }
     implementation 'com.saucelabs:saucerest:1.0.43'
 }
