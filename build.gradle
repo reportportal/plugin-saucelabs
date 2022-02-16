@@ -41,7 +41,7 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom(releaseMode ? 'com.epam.reportportal:commons-bom:' + getProperty('bom.version') : 'com.github.reportportal:commons-bom:4b7ed8a')
+        mavenBom(releaseMode ? 'com.epam.reportportal:commons-bom:' + getProperty('bom.version') : 'com.github.reportportal:commons-bom:5.6.0')
     }
 }
 

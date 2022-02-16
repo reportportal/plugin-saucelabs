@@ -27,11 +27,17 @@ import static com.epam.reportportal.saucelabs.SaucelabsProperties.DATA_CENTER;
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
-public class TestCommand implements com.epam.reportportal.extension.PluginCommand<Boolean> {
+public class TestConnectionCommand implements com.epam.reportportal.extension.PluginCommand<Boolean> {
+
+	private final RestClient restClient;
+
+	public TestConnectionCommand(RestClient restClient) {
+		this.restClient = restClient;
+	}
 
 	@Override
 	public Boolean executeCommand(Integration integration, Map params) {
-		SauceREST sauce = RestClient.buildSauceClient(integration, (String) params.get(DATA_CENTER.getName()));
+		SauceREST sauce = restClient.buildSauceClient(integration, (String) params.get(DATA_CENTER.getName()));
 		String username = sauce.getUser();
 		return StringUtils.isNotEmpty(username);
 	}

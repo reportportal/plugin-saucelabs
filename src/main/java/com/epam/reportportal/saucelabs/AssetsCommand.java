@@ -36,10 +36,16 @@ import static com.epam.reportportal.saucelabs.SaucelabsProperties.DATA_CENTER;
  */
 public class AssetsCommand implements PluginCommand<Object> {
 
+	private final RestClient restClient;
+
+	public AssetsCommand(RestClient restClient) {
+		this.restClient = restClient;
+	}
+
 	@Override
 	public Object executeCommand(Integration integration, Map<String, Object> params) {
 		ValidationUtils.validateParams(params);
-		SauceREST sauce = RestClient.buildSauceClient(integration, (String) params.get(DATA_CENTER.getName()));
+		SauceREST sauce = restClient.buildSauceClient(integration, (String) params.get(DATA_CENTER.getName()));
 		String jobId = (String) params.get(JOB_ID);
 		String assetsPrefix = sauce.getAppServer() + "rest/v1/" + sauce.getUsername() + "/jobs/" + jobId + "/assets/";
 		try {
