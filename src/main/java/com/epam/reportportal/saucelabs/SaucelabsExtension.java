@@ -29,6 +29,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -60,7 +61,12 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
 	}
 
 	@Override
-	public PluginCommand<?> getCommandToExecute(String commandName) {
+	public CommonPluginCommand getCommonCommand(String commandName) {
+		throw new UnsupportedOperationException("Plugin commands are not supported");
+	}
+
+	@Override
+	public PluginCommand getIntegrationCommand(String commandName) {
 		return pluginCommandMapping.get().get(commandName);
 	}
 
