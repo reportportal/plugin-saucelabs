@@ -45,10 +45,10 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
 	private final Supplier<RestClient> restClientSupplier;
 
 	@Autowired
-	private BasicTextEncryptor simpleEncryptor;
+	private BasicTextEncryptor basicEncryptor;
 
 	public SaucelabsExtension() {
-		restClientSupplier = new MemoizingSupplier<>(() -> new RestClient(simpleEncryptor));
+		restClientSupplier = new MemoizingSupplier<>(() -> new RestClient(basicEncryptor));
 	}
 
 
@@ -75,7 +75,7 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
 				.put("jobInfo", new JobInfoCommand(restClientSupplier.get()))
 				.put("testConnection", new TestConnectionCommand(restClientSupplier.get()))
 				.put("assets", new AssetsCommand(restClientSupplier.get()))
-				.put("token", new GenerateAuthTokenCommand(simpleEncryptor))
+				.put("token", new GenerateAuthTokenCommand(basicEncryptor))
 				.build();
 
 	}
