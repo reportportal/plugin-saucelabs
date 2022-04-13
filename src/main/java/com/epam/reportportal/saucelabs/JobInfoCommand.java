@@ -39,7 +39,7 @@ import static com.epam.reportportal.saucelabs.SaucelabsProperties.DATA_CENTER;
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
-public class JobInfoCommand implements PluginCommand {
+public class JobInfoCommand implements PluginCommand<Object> {
 
 	private final RestClient restClient;
 
@@ -63,5 +63,10 @@ public class JobInfoCommand implements PluginCommand {
 		} catch (IOException e) {
 			throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, e.getMessage());
 		}
+	}
+
+	@Override
+	public String getName() {
+		return "jobInfo";
 	}
 }

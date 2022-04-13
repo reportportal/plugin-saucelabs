@@ -16,6 +16,7 @@
 
 package com.epam.reportportal.saucelabs;
 
+import com.epam.reportportal.extension.CommonPluginCommand;
 import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.extension.ReportPortalExtensionPoint;
 import com.google.common.collect.ImmutableMap;
@@ -27,10 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -47,10 +45,10 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
 	private final Supplier<RestClient> restClientSupplier;
 
 	@Autowired
-	private BasicTextEncryptor simpleEncryptor;
+	private BasicTextEncryptor basicEncryptor;
 
 	public SaucelabsExtension() {
-		restClientSupplier = new MemoizingSupplier<>(() -> new RestClient(simpleEncryptor));
+		restClientSupplier = new MemoizingSupplier<>(() -> new RestClient(basicEncryptor));
 	}
 
 
@@ -63,7 +61,12 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
 	}
 
 	@Override
-	public PluginCommand<?> getCommandToExecute(String commandName) {
+	public CommonPluginCommand getCommonCommand(String commandName) {
+		throw new UnsupportedOperationException("Plugin commands are not supported");
+	}
+
+	@Override
+	public PluginCommand getIntegrationCommand(String commandName) {
 		return pluginCommandMapping.get().get(commandName);
 	}
 
@@ -72,7 +75,7 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
 				.put("jobInfo", new JobInfoCommand(restClientSupplier.get()))
 				.put("testConnection", new TestConnectionCommand(restClientSupplier.get()))
 				.put("assets", new AssetsCommand(restClientSupplier.get()))
-				.put("token", new GenerateAuthTokenCommand(simpleEncryptor))
+				.put("token", new GenerateAuthTokenCommand(basicEncryptor))
 				.build();
 
 	}

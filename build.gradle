@@ -41,7 +41,7 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom(releaseMode ? 'com.epam.reportportal:commons-bom:' + getProperty('bom.version') : 'com.github.reportportal:commons-bom:5.6.0')
+        mavenBom(releaseMode ? 'com.epam.reportportal:commons-bom:' + getProperty('bom.version') : 'com.github.reportportal:commons-bom:5.7.0')
     }
 }
 
@@ -50,8 +50,8 @@ dependencies {
         implementation 'com.epam.reportportal:plugin-api'
         annotationProcessor 'com.epam.reportportal:plugin-api'
     } else {
-        implementation 'com.github.reportportal:plugin-api:5.6.0'
-        annotationProcessor 'com.github.reportportal:plugin-api:5.6.0'
+        implementation 'com.github.reportportal:plugin-api:886ac55'
+        annotationProcessor 'com.github.reportportal:plugin-api:886ac55'
     }
     implementation 'com.saucelabs:saucerest:1.0.43'
 }

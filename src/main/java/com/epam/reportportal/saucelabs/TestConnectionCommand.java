@@ -41,4 +41,9 @@ public class TestConnectionCommand implements com.epam.reportportal.extension.Pl
 		String username = sauce.getUser();
 		return StringUtils.isNotEmpty(username);
 	}
+
+	@Override
+	public String getName() {
+		return "testConnection";
+	}
 }

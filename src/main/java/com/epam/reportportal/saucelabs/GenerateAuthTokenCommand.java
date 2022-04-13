@@ -21,7 +21,7 @@ import static com.epam.reportportal.saucelabs.ValidationUtils.validateParams;
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
-public class GenerateAuthTokenCommand implements PluginCommand {
+public class GenerateAuthTokenCommand implements PluginCommand<Object> {
 
 	private final BasicTextEncryptor textEncryptor;
 
@@ -51,5 +51,10 @@ public class GenerateAuthTokenCommand implements PluginCommand {
 		} catch (Exception e) {
 			throw new ReportPortalException(e.getMessage());
 		}
+	}
+
+	@Override
+	public String getName() {
+		return "token";
 	}
 }
