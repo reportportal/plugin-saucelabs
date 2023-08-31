@@ -38,7 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class SaucelabsExtension implements ReportPortalExtensionPoint {
 
 	private static final String DOCUMENTATION_LINK_FIELD = "documentationLink";
-	private static final String DOCUMENTATION_LINK = "https://reportportal.io/docs/plugins/Rally";
+	private static final String DOCUMENTATION_LINK = "https://reportportal.io/docs/plugins/SauceLabs";
 	static final String JOB_ID = "jobId";
 
 	private final Supplier<Map<String, PluginCommand<?>>> pluginCommandMapping = new MemoizingSupplier<>(this::getCommands);
