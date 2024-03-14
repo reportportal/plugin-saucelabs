@@ -16,50 +16,59 @@
 
 package com.epam.reportportal.saucelabs;
 
+import static com.epam.reportportal.saucelabs.SaucelabsProperties.ACCESS_TOKEN;
+import static com.epam.reportportal.saucelabs.SaucelabsProperties.DATA_CENTER;
+import static com.epam.reportportal.saucelabs.SaucelabsProperties.USERNAME;
+import static java.util.Optional.ofNullable;
+
 import com.epam.ta.reportportal.entity.integration.Integration;
 import com.epam.ta.reportportal.entity.integration.IntegrationParams;
 import com.epam.ta.reportportal.exception.ReportPortalException;
-import com.epam.ta.reportportal.ws.model.ErrorType;
+import com.epam.ta.reportportal.ws.reporting.ErrorType;
 import com.saucelabs.saucerest.DataCenter;
 import com.saucelabs.saucerest.SauceREST;
 import org.apache.commons.lang3.StringUtils;
 import org.jasypt.util.text.BasicTextEncryptor;
-
-import static com.epam.reportportal.saucelabs.SaucelabsProperties.*;
-import static java.util.Optional.ofNullable;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
 public class RestClient {
 
-	private final BasicTextEncryptor textEncryptor;
+  private final BasicTextEncryptor textEncryptor;
 
-	public RestClient(BasicTextEncryptor textEncryptor) {
-		this.textEncryptor = textEncryptor;
-	}
+  public RestClient(BasicTextEncryptor textEncryptor) {
+    this.textEncryptor = textEncryptor;
+  }
 
-	public SauceREST buildSauceClient(Integration system, String dataCenter) {
-		IntegrationParams params = ofNullable(system.getParams()).orElseThrow(() -> new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
-				"Integration params are not specified."
-		));
+  public SauceREST buildSauceClient(Integration system, String dataCenter) {
+    IntegrationParams params = ofNullable(system.getParams()).orElseThrow(
+        () -> new ReportPortalException(
+				ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
+            "Integration params are not specified."
+        ));
 
-		String username = USERNAME.getParam(params)
-				.orElseThrow(() -> new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, "Username is not specified."));
-		String accessToken = textEncryptor.decrypt(ACCESS_TOKEN.getParam(params)
-				.orElseThrow(() -> new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
-						"Access token is not specified."
-				)));
-		String dc = ofNullable(dataCenter).orElse(DATA_CENTER.getParam(params)
-				.orElseThrow(() -> new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, "Data center is not specified.")));
+    String username = USERNAME.getParam(params).orElseThrow(
+        () -> new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
+            "Username is not specified."
+        ));
+    String accessToken = textEncryptor.decrypt(ACCESS_TOKEN.getParam(params).orElseThrow(
+        () -> new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
+            "Access token is not specified."
+        )));
+    String dc = ofNullable(dataCenter).orElse(DATA_CENTER.getParam(params).orElseThrow(
+        () -> new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
+            "Data center is not specified."
+        )));
 
-		SauceREST sauceREST = new SauceREST(username, accessToken, DataCenter.fromString(dc));
+    SauceREST sauceREST = new SauceREST(username, accessToken, DataCenter.fromString(dc));
 
-		if (StringUtils.isEmpty(sauceREST.getUser())) {
-			throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, "Incorrect Username or Access token");
-		}
+    if (StringUtils.isEmpty(sauceREST.getUser())) {
+      throw new ReportPortalException(
+          ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, "Incorrect Username or Access token");
+    }
 
-		return sauceREST;
-	}
+    return sauceREST;
+  }
 
 }
