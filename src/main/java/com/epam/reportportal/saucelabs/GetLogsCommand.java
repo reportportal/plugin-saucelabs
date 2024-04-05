@@ -20,10 +20,10 @@ import static com.epam.reportportal.saucelabs.SaucelabsExtension.JOB_ID;
 import static com.epam.reportportal.saucelabs.SaucelabsProperties.DATA_CENTER;
 
 import com.epam.reportportal.extension.PluginCommand;
-import com.epam.ta.reportportal.commons.validation.Suppliers;
+import com.epam.reportportal.rules.commons.validation.Suppliers;
 import com.epam.ta.reportportal.entity.integration.Integration;
-import com.epam.ta.reportportal.exception.ReportPortalException;
-import com.epam.ta.reportportal.ws.reporting.ErrorType;
+import com.epam.reportportal.rules.exception.ReportPortalException;
+import com.epam.reportportal.rules.exception.ErrorType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saucelabs.saucerest.SauceREST;
 import java.io.IOException;
