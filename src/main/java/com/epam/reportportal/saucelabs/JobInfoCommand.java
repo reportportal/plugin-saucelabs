@@ -21,11 +21,12 @@ import static com.epam.reportportal.saucelabs.SaucelabsProperties.DATA_CENTER;
 
 import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.rules.commons.validation.Suppliers;
-import com.epam.ta.reportportal.entity.integration.Integration;
-import com.epam.reportportal.rules.exception.ReportPortalException;
 import com.epam.reportportal.rules.exception.ErrorType;
+import com.epam.reportportal.rules.exception.ReportPortalException;
+import com.epam.ta.reportportal.entity.integration.Integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saucelabs.saucerest.SauceREST;
+import com.saucelabs.saucerest.model.jobs.Job;
 import java.io.IOException;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
@@ -48,16 +49,17 @@ public class JobInfoCommand implements PluginCommand<Object> {
         restClient.buildSauceClient(integration, (String) params.get(DATA_CENTER.getName()));
     try {
       String jobId = (String) params.get(JOB_ID);
-      String jobInfo = sauce.getJobInfo(jobId);
-      if (StringUtils.isEmpty(jobInfo)) {
+      Job jobInfo = sauce.getJobsEndpoint().getJobDetails(jobId);
+      if (jobInfo == null) {
         throw new ReportPortalException(
             ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
             Suppliers.formattedSupplier("Job '{}' not found.", jobId)
         );
       }
-      return new ObjectMapper().readValue(jobInfo, Object.class);
+      return new ObjectMapper().readValue(jobInfo.toJson(), Object.class);
     } catch (IOException e) {
-      throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, e.getMessage());
+      throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
+          StringUtils.normalizeSpace(e.getMessage()));
     }
   }
 

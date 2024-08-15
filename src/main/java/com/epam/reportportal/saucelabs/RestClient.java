@@ -63,7 +63,7 @@ public class RestClient {
 
     SauceREST sauceREST = new SauceREST(username, accessToken, DataCenter.fromString(dc));
 
-    if (StringUtils.isEmpty(sauceREST.getUser())) {
+    if (StringUtils.isEmpty(sauceREST.getUsername())) {
       throw new ReportPortalException(
           ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, "Incorrect Username or Access token");
     }

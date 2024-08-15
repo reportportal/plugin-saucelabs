@@ -18,16 +18,23 @@ package com.epam.reportportal.saucelabs;
 
 import static com.epam.reportportal.saucelabs.SaucelabsExtension.JOB_ID;
 import static com.epam.reportportal.saucelabs.SaucelabsProperties.DATA_CENTER;
+import static com.saucelabs.saucerest.TestAsset.SAUCE_LOG;
 
 import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.rules.commons.validation.Suppliers;
-import com.epam.ta.reportportal.entity.integration.Integration;
-import com.epam.reportportal.rules.exception.ReportPortalException;
 import com.epam.reportportal.rules.exception.ErrorType;
+import com.epam.reportportal.rules.exception.ReportPortalException;
+import com.epam.ta.reportportal.entity.integration.Integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saucelabs.saucerest.SauceREST;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.Map;
+import java.util.UUID;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -48,17 +55,25 @@ public class GetLogsCommand implements PluginCommand<Object> {
         restClient.buildSauceClient(system, (String) params.get(DATA_CENTER.getName()));
     try {
       String jobId = (String) params.get(JOB_ID);
-      String content =
-          sauce.retrieveResults(sauce.getUsername() + "/jobs/" + jobId + "/assets/log.json");
-      if (StringUtils.isEmpty(content)) {
+      String logFileName = sauce.getJobsEndpoint().listJobAssets(jobId).sauceLog;
+      if (StringUtils.isEmpty(logFileName)) {
         throw new ReportPortalException(
             ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
-            Suppliers.formattedSupplier("Job '{}' not found.", jobId)
+            Suppliers.formattedSupplier("Resource '{}' not found.", jobId)
         );
       }
-      return new ObjectMapper().readValue(content, Object.class);
+
+      Path saveToPath = Path.of(UUID.randomUUID() + "_" + logFileName);
+      sauce.getJobsEndpoint().downloadJobAsset(jobId, saveToPath, SAUCE_LOG);
+
+      FileInputStream fis = new FileInputStream(saveToPath.toFile());
+      String fileContent = IOUtils.toString(fis, StandardCharsets.UTF_8);
+      FileUtils.delete(saveToPath.toFile());
+
+      return new ObjectMapper().readValue(fileContent, Object.class);
     } catch (IOException e) {
-      throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, e.getMessage());
+      throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
+          StringUtils.normalizeSpace(e.getMessage()));
     }
   }
 
