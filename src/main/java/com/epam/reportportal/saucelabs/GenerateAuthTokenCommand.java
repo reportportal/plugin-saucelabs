@@ -3,12 +3,12 @@ package com.epam.reportportal.saucelabs;
 import static com.epam.reportportal.saucelabs.SaucelabsExtension.JOB_ID;
 import static com.epam.reportportal.saucelabs.SaucelabsProperties.ACCESS_TOKEN;
 import static com.epam.reportportal.saucelabs.SaucelabsProperties.USERNAME;
+import static com.epam.reportportal.saucelabs.ValidationUtils.validateIntegrationParams;
 import static com.epam.reportportal.saucelabs.ValidationUtils.validateParams;
 
 import com.epam.reportportal.extension.PluginCommand;
-import com.epam.ta.reportportal.entity.integration.Integration;
 import com.epam.reportportal.rules.exception.ReportPortalException;
-import com.epam.reportportal.rules.exception.ErrorType;
+import com.epam.ta.reportportal.entity.integration.Integration;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
@@ -32,16 +32,10 @@ public class GenerateAuthTokenCommand implements PluginCommand<Object> {
   public Object executeCommand(Integration integration, Map params) {
     try {
       validateParams(params);
+      validateIntegrationParams(integration.getParams());
 
-      String username = USERNAME.getParam(integration.getParams()).orElseThrow(
-          () -> new ReportPortalException(
-				  ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
-              "Username is not specified."
-          ));
-      String accessToken = textEncryptor.decrypt(ACCESS_TOKEN.getParam(integration.getParams())
-          .orElseThrow(() -> new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
-              "Access token is not specified."
-          )));
+      String username = USERNAME.getParam(integration.getParams());
+      String accessToken = textEncryptor.decrypt(ACCESS_TOKEN.getParam(integration.getParams()));
 
       SecretKeySpec keySpec =
           new SecretKeySpec((username + ":" + accessToken).getBytes(StandardCharsets.UTF_8),

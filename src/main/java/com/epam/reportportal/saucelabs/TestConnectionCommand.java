@@ -16,33 +16,37 @@
 
 package com.epam.reportportal.saucelabs;
 
+import static com.epam.reportportal.saucelabs.SaucelabsProperties.DATA_CENTER;
+import static com.epam.reportportal.saucelabs.utils.OldDatacenterResolver.resolveDatacenterDeprecatedName;
+
 import com.epam.ta.reportportal.entity.integration.Integration;
 import com.saucelabs.saucerest.SauceREST;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.Map;
-
-import static com.epam.reportportal.saucelabs.SaucelabsProperties.DATA_CENTER;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
-public class TestConnectionCommand implements com.epam.reportportal.extension.PluginCommand<Boolean> {
+public class TestConnectionCommand implements
+    com.epam.reportportal.extension.PluginCommand<Boolean> {
 
-	private final RestClient restClient;
+  private final SauceRestClient sauceRestClient;
 
-	public TestConnectionCommand(RestClient restClient) {
-		this.restClient = restClient;
-	}
+  public TestConnectionCommand(SauceRestClient sauceRestClient) {
+    this.sauceRestClient = sauceRestClient;
+  }
 
-	@Override
-	public Boolean executeCommand(Integration integration, Map params) {
-		SauceREST sauce = restClient.buildSauceClient(integration, (String) params.get(DATA_CENTER.getName()));
-		return StringUtils.isNotEmpty(sauce.getUsername());
-	}
+  @Override
+  public Boolean executeCommand(Integration integration, Map params) {
+    ValidationUtils.validateIntegrationParams(integration.getParams());
+    String datacenter = (String) params.get(DATA_CENTER.getName());
+    SauceREST sauce = sauceRestClient.buildSauceClient(integration,
+        resolveDatacenterDeprecatedName(datacenter));
+    return StringUtils.isNotEmpty(sauce.getUsername());
+  }
 
-	@Override
-	public String getName() {
-		return "testConnection";
-	}
+  @Override
+  public String getName() {
+    return "testConnection";
+  }
 }
