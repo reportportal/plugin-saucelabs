@@ -42,12 +42,25 @@ dependencies {
         implementation 'com.epam.reportportal:plugin-api'
         annotationProcessor 'com.epam.reportportal:plugin-api'
     } else {
-        implementation 'com.github.reportportal:commons-dao:7de2ad1'
-        implementation 'com.github.reportportal:plugin-api:9bc4735'
-        annotationProcessor 'com.github.reportportal:plugin-api:9bc4735'
+        implementation 'com.github.reportportal:commons-dao:28d0461'
+        implementation 'com.github.reportportal:plugin-api:a9a8b73'
+        annotationProcessor 'com.github.reportportal:plugin-api:a9a8b73'
     }
     implementation 'org.hibernate:hibernate-core:5.6.15.Final'
-    implementation 'com.saucelabs:saucerest:1.0.43'
+
+    // TODO: 2.5.3+ switched to camel-case models. UI updates required
+    implementation 'com.saucelabs:saucerest:2.5.1'
+    implementation 'dev.failsafe:failsafe:3.3.2'
+    implementation 'org.awaitility:awaitility:4.2.2'
+    implementation 'org.hamcrest:hamcrest-core:2.2'
+    runtimeOnly 'com.squareup.moshi:moshi:1.15.1'
+
+    // add lombok support
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
 }
 
 generatePomFileForShadowPublication { pom.packaging = "jar" }
@@ -69,8 +82,13 @@ shadowJar {
     archiveClassifier.set(null)
     zip64 true
     dependencies {
-        include(dependency('com.saucelabs:saucerest:1.0.43'))
-        include(dependency('org.json:json:20171018'))
+        include(dependency('com.saucelabs:saucerest:2.5.1'))
+        include(dependency('org.json:json:20240303'))
+        include(dependency('org.awaitility:awaitility:4.2.2'))
+        include(dependency('org.hamcrest:hamcrest:2.2'))
+        include(dependency('com.squareup.moshi:moshi:1.15.1'))
+        include(dependency('net.jodah:failsafe:2.4.4'))
+
     }
 }
 

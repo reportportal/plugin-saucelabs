@@ -17,53 +17,83 @@
 package com.epam.reportportal.saucelabs;
 
 import static com.epam.reportportal.saucelabs.SaucelabsExtension.JOB_ID;
-import static com.epam.reportportal.saucelabs.SaucelabsProperties.DATA_CENTER;
 
 import com.epam.reportportal.extension.PluginCommand;
-import com.epam.reportportal.rules.commons.validation.Suppliers;
-import com.epam.ta.reportportal.entity.integration.Integration;
-import com.epam.reportportal.rules.exception.ReportPortalException;
 import com.epam.reportportal.rules.exception.ErrorType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.saucelabs.saucerest.SauceREST;
-import java.io.IOException;
+import com.epam.reportportal.rules.exception.ReportPortalException;
+import com.epam.reportportal.saucelabs.client.RestClientBuilder;
+import com.epam.reportportal.saucelabs.model.SauceProperties;
+import com.epam.ta.reportportal.entity.integration.Integration;
+import com.saucelabs.saucerest.model.jobs.JobAssets;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
+@Slf4j
 public class GetLogsCommand implements PluginCommand<Object> {
 
-  private final RestClient restClient;
+  private final RestClientBuilder restClient;
 
-  public GetLogsCommand(RestClient restClient) {
+  public GetLogsCommand(RestClientBuilder restClient) {
     this.restClient = restClient;
   }
 
   @Override
-  public Object executeCommand(Integration system, Map<String, Object> params) {
+  public Object executeCommand(Integration integration, Map<String, Object> params) {
     ValidationUtils.validateParams(params);
-    SauceREST sauce =
-        restClient.buildSauceClient(system, (String) params.get(DATA_CENTER.getName()));
+    ValidationUtils.validateIntegrationParams(integration.getParams());
+
+    SauceProperties sp = new SauceProperties(integration.getParams().getParams());
+    sp.setJobId((String) params.get(JOB_ID));
+
+    return getWebDriverLogs(restClient.buildRestTemplate(sp), sp);
+  }
+
+
+  private Object getWebDriverLogs(RestTemplate restTemplate, SauceProperties sp) {
     try {
-      String jobId = (String) params.get(JOB_ID);
-      String content =
-          sauce.retrieveResults(sauce.getUsername() + "/jobs/" + jobId + "/assets/log.json");
-      if (StringUtils.isEmpty(content)) {
-        throw new ReportPortalException(
-            ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
-            Suppliers.formattedSupplier("Job '{}' not found.", jobId)
-        );
+      JobAssets jobAssets =
+          restTemplate.getForObject(getJobAssetsUrl(sp), JobAssets.class);
+      String url = getJobAssetsUrl(sp) + "/" + jobAssets.sauceLog;
+      return restTemplate.getForObject(url, Object.class);
+
+    } catch (HttpClientErrorException httpException) {
+
+      if (httpException.getStatusCode().is4xxClientError()) {
+        return getRealDeviceLogs(restTemplate, sp);
+
+      } else {
+        throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
+            StringUtils.normalizeSpace("Failed to retrieve job assets"));
       }
-      return new ObjectMapper().readValue(content, Object.class);
-    } catch (IOException e) {
-      throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, e.getMessage());
     }
+  }
+
+
+  // TODO: handle RD endpoint in a separate plugin command. UI updates required
+  private Object getRealDeviceLogs(RestTemplate restTemplate, SauceProperties sp) {
+    String url = "/v1/rdc/jobs/" + sp.getJobId() + "/deviceLogs";
+    return restTemplate.getForObject(url, Object.class);
   }
 
   @Override
   public String getName() {
     return "logs";
   }
+
+  private String getJobAssetsUrl(SauceProperties sp) {
+    return new StringBuilder()
+        .append("/rest/v1/")
+        .append(sp.getUsername())
+        .append("/jobs/")
+        .append(sp.getJobId())
+        .append("/assets")
+        .toString();
+  }
+
 }
