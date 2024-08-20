@@ -24,7 +24,6 @@ import com.epam.reportportal.saucelabs.model.SauceProperties;
 import com.epam.ta.reportportal.entity.integration.Integration;
 import com.epam.ta.reportportal.exception.ReportPortalException;
 import com.epam.ta.reportportal.ws.model.ErrorType;
-import com.saucelabs.saucerest.model.jobs.JobAssets;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -54,9 +53,7 @@ public class GetLogsCommand implements PluginCommand<Object> {
 
   private Object getWebDriverLogs(RestTemplate restTemplate, SauceProperties sp) {
     try {
-      JobAssets jobAssets =
-          restTemplate.getForObject(getJobAssetsUrl(sp), JobAssets.class);
-      String url = getJobAssetsUrl(sp) + "/" + jobAssets.sauceLog;
+      String url = getJobAssetsUrl(sp) + "/log.json";
       return restTemplate.getForObject(url, Object.class);
     } catch (HttpClientErrorException httpException) {
 
