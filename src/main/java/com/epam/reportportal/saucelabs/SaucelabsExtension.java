@@ -19,14 +19,13 @@ package com.epam.reportportal.saucelabs;
 import com.epam.reportportal.extension.CommonPluginCommand;
 import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.extension.ReportPortalExtensionPoint;
+import com.epam.reportportal.saucelabs.client.RestClientBuilder;
 import com.google.common.collect.ImmutableMap;
-import com.saucelabs.saucerest.DataCenter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import org.jasypt.util.text.BasicTextEncryptor;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,13 +42,15 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
 
 	private final Supplier<Map<String, PluginCommand<?>>> pluginCommandMapping = new MemoizingSupplier<>(this::getCommands);
 
-	private final Supplier<RestClient> restClientSupplier;
+	private final Supplier<SauceRestClient> restClientSupplier;
+	private final Supplier<RestClientBuilder> newRestClientSupplier;
 
 	@Autowired
 	private BasicTextEncryptor basicEncryptor;
 
 	public SaucelabsExtension() {
-		restClientSupplier = new MemoizingSupplier<>(() -> new RestClient(basicEncryptor));
+		restClientSupplier = new MemoizingSupplier<>(() -> new SauceRestClient(basicEncryptor));
+    newRestClientSupplier = new MemoizingSupplier<>(() -> new RestClientBuilder(basicEncryptor));
 	}
 
 
@@ -58,7 +59,9 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
 		Map<String, Object> params = new HashMap<>();
 		params.put(ALLOWED_COMMANDS, new ArrayList<>(pluginCommandMapping.get().keySet()));
 		params.put(DOCUMENTATION_LINK_FIELD, DOCUMENTATION_LINK);
-		params.put("dataCenters", Arrays.stream(DataCenter.values()).map(Enum::toString).collect(Collectors.toList()));
+		//params.put("dataCenters", Arrays.stream(DataCenter.values()).map(Enum::toString).collect(Collectors.toList()));
+		params.put("dataCenters", Arrays.asList("US", "EU"));
+
 		return params;
 	}
 
@@ -73,10 +76,11 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
 	}
 
 	private Map<String, PluginCommand<?>> getCommands() {
-		return ImmutableMap.<String, PluginCommand<?>>builder().put("logs", new GetLogsCommand(restClientSupplier.get()))
+		return ImmutableMap.<String, PluginCommand<?>>builder()
+        .put("logs", new GetLogsCommand(newRestClientSupplier.get()))
 				.put("jobInfo", new JobInfoCommand(restClientSupplier.get()))
 				.put("testConnection", new TestConnectionCommand(restClientSupplier.get()))
-				.put("assets", new AssetsCommand(restClientSupplier.get()))
+				.put("assets", new AssetsCommand(newRestClientSupplier.get()))
 				.put("token", new GenerateAuthTokenCommand(basicEncryptor))
 				.build();
 
