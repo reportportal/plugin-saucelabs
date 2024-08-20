@@ -15,10 +15,10 @@
  */
 package com.epam.reportportal.saucelabs;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @author <a href="mailto:ivan_budayeu@epam.com">Ivan Budayeu</a>

@@ -18,29 +18,27 @@ package com.epam.reportportal.saucelabs;
 
 import com.epam.ta.reportportal.entity.integration.IntegrationParams;
 
-import java.util.Optional;
-
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
 public enum SaucelabsProperties {
 
-	USERNAME("username"),
-	ACCESS_TOKEN("accessToken"),
-	DATA_CENTER("dataCenter");
+  USERNAME("username"),
+  ACCESS_TOKEN("accessToken"),
+  DATA_CENTER("dataCenter");
 
-	private final String name;
+  private final String name;
 
-	SaucelabsProperties(String name) {
-		this.name = name;
-	}
+  SaucelabsProperties(String name) {
+    this.name = name;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public Optional<String> getParam(IntegrationParams params) {
-		return Optional.ofNullable(params.getParams().get(this.name)).map(String::valueOf);
-	}
+  public String getParam(IntegrationParams params) {
+    return params.getParams().get(this.name).toString();
+  }
 
 }
