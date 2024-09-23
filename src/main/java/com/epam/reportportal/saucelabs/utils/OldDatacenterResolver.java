@@ -16,9 +16,8 @@
 
 package com.epam.reportportal.saucelabs.utils;
 
-
-import com.epam.ta.reportportal.exception.ReportPortalException;
-import com.epam.ta.reportportal.ws.model.ErrorType;
+import com.epam.reportportal.rules.exception.ErrorType;
+import com.epam.reportportal.rules.exception.ReportPortalException;
 import com.saucelabs.saucerest.DataCenter;
 
 /**

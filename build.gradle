@@ -32,19 +32,20 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom(releaseMode ? 'com.epam.reportportal:commons-bom:' + getProperty('bom.version') : 'com.epam.reportportal:commons-bom:5.11.0')
+        mavenBom(releaseMode ? 'com.epam.reportportal:commons-bom:' + getProperty('bom.version') : 'com.epam.reportportal:commons-bom:5.12.1')
     }
 }
 
 dependencies {
     if (releaseMode) {
+        implementation 'com.epam.reportportal:commons-dao'
         implementation 'com.epam.reportportal:plugin-api'
         annotationProcessor 'com.epam.reportportal:plugin-api'
     } else {
-        implementation 'com.epam.reportportal:plugin-api'
-        annotationProcessor 'com.epam.reportportal:plugin-api'
+        implementation 'com.github.reportportal:commons-dao:acf1ec7'
+        implementation 'com.github.reportportal:plugin-api:188792e'
+        annotationProcessor 'com.github.reportportal:plugin-api:188792e'
     }
-    implementation 'com.saucelabs:saucerest:1.0.43'
     implementation 'org.hibernate:hibernate-core:5.6.15.Final'
 
     // TODO: 2.5.3+ switched to camel-case models. UI updates required

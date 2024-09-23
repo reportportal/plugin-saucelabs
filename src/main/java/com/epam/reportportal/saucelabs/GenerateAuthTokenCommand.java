@@ -7,8 +7,8 @@ import static com.epam.reportportal.saucelabs.ValidationUtils.validateIntegratio
 import static com.epam.reportportal.saucelabs.ValidationUtils.validateParams;
 
 import com.epam.reportportal.extension.PluginCommand;
+import com.epam.reportportal.rules.exception.ReportPortalException;
 import com.epam.ta.reportportal.entity.integration.Integration;
-import com.epam.ta.reportportal.exception.ReportPortalException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
@@ -22,38 +22,36 @@ import org.jasypt.util.text.BasicTextEncryptor;
  */
 public class GenerateAuthTokenCommand implements PluginCommand<Object> {
 
-	private final BasicTextEncryptor textEncryptor;
+  private final BasicTextEncryptor textEncryptor;
 
-	public GenerateAuthTokenCommand(BasicTextEncryptor textEncryptor) {
-		this.textEncryptor = textEncryptor;
-	}
+  public GenerateAuthTokenCommand(BasicTextEncryptor textEncryptor) {
+    this.textEncryptor = textEncryptor;
+  }
 
-	@Override
-	public Object executeCommand(Integration integration, Map params) {
-		try {
-			validateParams(params);
+  @Override
+  public Object executeCommand(Integration integration, Map params) {
+    try {
+      validateParams(params);
       validateIntegrationParams(integration.getParams());
 
-			String username = USERNAME.getParam(integration.getParams())
-					;
-			String accessToken = textEncryptor.decrypt(ACCESS_TOKEN.getParam(integration.getParams())
+      String username = USERNAME.getParam(integration.getParams());
+      String accessToken = textEncryptor.decrypt(ACCESS_TOKEN.getParam(integration.getParams()));
 
-					);
+      SecretKeySpec keySpec =
+          new SecretKeySpec((username + ":" + accessToken).getBytes(StandardCharsets.UTF_8),
+              "HmacMD5"
+          );
+      Mac mac = Mac.getInstance("HmacMD5");
+      mac.init(keySpec);
+      return Collections.singletonMap("token", Hex.encodeHexString(
+          mac.doFinal(params.get(JOB_ID).toString().getBytes(StandardCharsets.UTF_8))));
+    } catch (Exception e) {
+      throw new ReportPortalException(e.getMessage());
+    }
+  }
 
-			SecretKeySpec keySpec = new SecretKeySpec((username + ":" + accessToken).getBytes(StandardCharsets.UTF_8), "HmacMD5");
-			Mac mac = Mac.getInstance("HmacMD5");
-			mac.init(keySpec);
-			return Collections.singletonMap(
-					"token",
-					Hex.encodeHexString(mac.doFinal(params.get(JOB_ID).toString().getBytes(StandardCharsets.UTF_8)))
-			);
-		} catch (Exception e) {
-			throw new ReportPortalException(e.getMessage());
-		}
-	}
-
-	@Override
-	public String getName() {
-		return "token";
-	}
+  @Override
+  public String getName() {
+    return "token";
+  }
 }

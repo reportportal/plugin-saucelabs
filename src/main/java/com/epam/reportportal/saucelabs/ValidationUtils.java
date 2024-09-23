@@ -16,15 +16,15 @@
 
 package com.epam.reportportal.saucelabs;
 
+import static com.epam.reportportal.rules.commons.validation.BusinessRule.expect;
 import static com.epam.reportportal.saucelabs.SaucelabsExtension.JOB_ID;
 import static com.epam.reportportal.saucelabs.SaucelabsProperties.ACCESS_TOKEN;
 import static com.epam.reportportal.saucelabs.SaucelabsProperties.DATA_CENTER;
 import static com.epam.reportportal.saucelabs.SaucelabsProperties.USERNAME;
-import static com.epam.ta.reportportal.commons.validation.BusinessRule.expect;
 
+import com.epam.reportportal.rules.exception.ErrorType;
 import com.epam.ta.reportportal.commons.Predicates;
 import com.epam.ta.reportportal.entity.integration.IntegrationParams;
-import com.epam.ta.reportportal.ws.model.ErrorType;
 import java.util.Map;
 
 /**
@@ -32,11 +32,12 @@ import java.util.Map;
  */
 public class ValidationUtils {
 
-	public static final String IS_NOT_SPECIFIED = " is not specified.";public static void validateParams(Map params) {
-		expect(params.get(JOB_ID), Predicates.notNull()).verify(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
-				JOB_ID + " parameter should be provided"
-		);
-	}
+  public static final String IS_NOT_SPECIFIED = " is not specified.";
+
+  public static void validateParams(Map params) {
+    expect(params.get(JOB_ID), Predicates.notNull()).verify(
+        ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, JOB_ID + " parameter should be provided");
+  }
 
   public static void validateIntegrationParams(IntegrationParams integrationParams) {
 

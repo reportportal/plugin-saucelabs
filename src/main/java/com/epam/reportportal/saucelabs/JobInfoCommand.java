@@ -21,10 +21,10 @@ import static com.epam.reportportal.saucelabs.SaucelabsProperties.DATA_CENTER;
 import static com.epam.reportportal.saucelabs.utils.OldDatacenterResolver.resolveDatacenterDeprecatedName;
 
 import com.epam.reportportal.extension.PluginCommand;
+import com.epam.reportportal.rules.exception.ErrorType;
+import com.epam.reportportal.rules.exception.ReportPortalException;
 import com.epam.reportportal.saucelabs.utils.JsonUtils;
 import com.epam.ta.reportportal.entity.integration.Integration;
-import com.epam.ta.reportportal.exception.ReportPortalException;
-import com.epam.ta.reportportal.ws.model.ErrorType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saucelabs.saucerest.SauceException;
 import com.saucelabs.saucerest.SauceREST;
@@ -41,47 +41,49 @@ import org.apache.commons.lang3.StringUtils;
 @Slf4j
 public class JobInfoCommand implements PluginCommand<Object> {
 
-	private final SauceRestClient sauceRestClient;
+  private final SauceRestClient sauceRestClient;
 
-	public JobInfoCommand(SauceRestClient sauceRestClient) {
-		this.sauceRestClient = sauceRestClient;
-	}
+  public JobInfoCommand(SauceRestClient sauceRestClient) {
+    this.sauceRestClient = sauceRestClient;
+  }
 
-	@Override
-	public Object executeCommand(Integration integration, Map params) {
-		ValidationUtils.validateParams(params);
-		String datacenter = (String) params.get(DATA_CENTER.getName());
-		SauceREST sauce =
+  @Override
+  public Object executeCommand(Integration integration, Map params) {
+    ValidationUtils.validateParams(params);
+    String datacenter = (String) params.get(DATA_CENTER.getName());
+
+    SauceREST sauce =
         sauceRestClient.buildSauceClient(integration, resolveDatacenterDeprecatedName(datacenter));
-			String jobId = (String) params.get(JOB_ID);
-			try {
-      return findJobById(sauce,jobId);
-			} catch (IOException e) {
-				throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
-						StringUtils.normalizeSpace(e.getMessage()));
+    String jobId = (String) params.get(JOB_ID);
+
+    try {
+      return findJobById(sauce, jobId);
+    } catch (IOException e) {
+      throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
+          StringUtils.normalizeSpace(e.getMessage()));
     }
   }
 
   private Object findJobById(SauceREST sauce, String jobId)
-				throws IOException {
+      throws IOException {
     Object response;
     try {
-			// find job if exists
-			Job jobInfo = sauce.getJobsEndpoint().getJobDetails(jobId);
+      // find job if exists
+      Job jobInfo = sauce.getJobsEndpoint().getJobDetails(jobId);
       response = new ObjectMapper().readValue(jobInfo.toJson(), Object.class);
-		} catch (SauceException jobException) {
+    } catch (SauceException jobException) {
       // If job not exists find real device job
       // TODO: introduce separate plugin command. UI updates required
       DeviceJob dj = sauce.getRealDevicesEndpoint().getSpecificDeviceJob(jobId);
       JsonUtils.toJson(dj, DeviceJob.class);
-			response = new ObjectMapper()
+      response = new ObjectMapper()
           .readValue(JsonUtils.toJson(dj, DeviceJob.class), Object.class);
     }
-		return response;
-	}
+    return response;
+  }
 
-	@Override
-	public String getName() {
-		return "jobInfo";
-	}
+  @Override
+  public String getName() {
+    return "jobInfo";
+  }
 }

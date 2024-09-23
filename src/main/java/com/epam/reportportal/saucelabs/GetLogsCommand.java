@@ -19,11 +19,11 @@ package com.epam.reportportal.saucelabs;
 import static com.epam.reportportal.saucelabs.SaucelabsExtension.JOB_ID;
 
 import com.epam.reportportal.extension.PluginCommand;
+import com.epam.reportportal.rules.exception.ErrorType;
+import com.epam.reportportal.rules.exception.ReportPortalException;
 import com.epam.reportportal.saucelabs.client.RestClientBuilder;
 import com.epam.reportportal.saucelabs.model.SauceProperties;
 import com.epam.ta.reportportal.entity.integration.Integration;
-import com.epam.ta.reportportal.exception.ReportPortalException;
-import com.epam.ta.reportportal.ws.model.ErrorType;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -46,15 +46,19 @@ public class GetLogsCommand implements PluginCommand<Object> {
   public Object executeCommand(Integration integration, Map<String, Object> params) {
     ValidationUtils.validateParams(params);
     ValidationUtils.validateIntegrationParams(integration.getParams());
+
     SauceProperties sp = new SauceProperties(integration.getParams().getParams());
     sp.setJobId((String) params.get(JOB_ID));
+
     return getWebDriverLogs(restClient.buildRestTemplate(sp), sp);
   }
+
 
   private Object getWebDriverLogs(RestTemplate restTemplate, SauceProperties sp) {
     try {
       String url = getJobAssetsUrl(sp) + "/log.json";
       return restTemplate.getForObject(url, Object.class);
+
     } catch (HttpClientErrorException httpException) {
 
       if (httpException.getStatusCode().is4xxClientError()) {
@@ -66,6 +70,7 @@ public class GetLogsCommand implements PluginCommand<Object> {
       }
     }
   }
+
 
   // TODO: handle RD endpoint in a separate plugin command. UI updates required
   private Object getRealDeviceLogs(RestTemplate restTemplate, SauceProperties sp) {
@@ -87,4 +92,5 @@ public class GetLogsCommand implements PluginCommand<Object> {
         .append("/assets")
         .toString();
   }
+
 }
