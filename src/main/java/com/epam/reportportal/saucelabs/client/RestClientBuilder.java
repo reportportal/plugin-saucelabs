@@ -1,7 +1,6 @@
 package com.epam.reportportal.saucelabs.client;
 
 import com.epam.reportportal.saucelabs.model.SauceProperties;
-import lombok.Getter;
 import org.jasypt.util.text.BasicTextEncryptor;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.client.RestTemplate;
@@ -18,7 +17,7 @@ public class RestClientBuilder {
 
     return new RestTemplateBuilder()
         .basicAuthentication(sp.getUsername(), textEncryptor.decrypt(sp.getToken()))
-        .rootUri(sp.getDatacenter().apiServer)
+        .rootUri(sp.getDatacenter().getBaseUrl())
         .build();
 
   }

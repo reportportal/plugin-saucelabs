@@ -1,10 +1,10 @@
-package com.epam.reportportal.saucelabs;
+package com.epam.reportportal.saucelabs.command;
 
-import static com.epam.reportportal.saucelabs.SaucelabsExtension.JOB_ID;
-import static com.epam.reportportal.saucelabs.SaucelabsProperties.ACCESS_TOKEN;
-import static com.epam.reportportal.saucelabs.SaucelabsProperties.USERNAME;
+import static com.epam.reportportal.saucelabs.model.SaucelabsProperties.ACCESS_TOKEN;
+import static com.epam.reportportal.saucelabs.model.SaucelabsProperties.USERNAME;
 import static com.epam.reportportal.saucelabs.ValidationUtils.validateIntegrationParams;
-import static com.epam.reportportal.saucelabs.ValidationUtils.validateParams;
+import static com.epam.reportportal.saucelabs.ValidationUtils.validateJobId;
+import static com.epam.reportportal.saucelabs.model.Constants.JOB_ID;
 
 import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.rules.exception.ReportPortalException;
@@ -31,7 +31,7 @@ public class GenerateAuthTokenCommand implements PluginCommand<Object> {
   @Override
   public Object executeCommand(Integration integration, Map params) {
     try {
-      validateParams(params);
+      validateJobId(params);
       validateIntegrationParams(integration.getParams());
 
       String username = USERNAME.getParam(integration.getParams());

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.epam.reportportal.saucelabs;
+package com.epam.reportportal.saucelabs.model;
 
 import com.epam.ta.reportportal.entity.integration.IntegrationParams;
 

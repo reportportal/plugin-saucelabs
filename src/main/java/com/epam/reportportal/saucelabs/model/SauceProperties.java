@@ -1,11 +1,9 @@
 package com.epam.reportportal.saucelabs.model;
 
-import static com.epam.reportportal.saucelabs.SaucelabsProperties.ACCESS_TOKEN;
-import static com.epam.reportportal.saucelabs.SaucelabsProperties.DATA_CENTER;
-import static com.epam.reportportal.saucelabs.SaucelabsProperties.USERNAME;
-import static com.epam.reportportal.saucelabs.utils.OldDatacenterResolver.resolveDatacenterDeprecatedName;
+import static com.epam.reportportal.saucelabs.model.SaucelabsProperties.ACCESS_TOKEN;
+import static com.epam.reportportal.saucelabs.model.SaucelabsProperties.DATA_CENTER;
+import static com.epam.reportportal.saucelabs.model.SaucelabsProperties.USERNAME;
 
-import com.saucelabs.saucerest.DataCenter;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,6 +29,6 @@ public class SauceProperties {
   public SauceProperties(Map<String, Object> params) {
     this.username = (String) params.get(USERNAME.getName());
     this.token = (String) params.get(ACCESS_TOKEN.getName());
-    this.datacenter = resolveDatacenterDeprecatedName((String) params.get(DATA_CENTER.getName()));
+    this.datacenter = DataCenter.fromString((String) params.get(DATA_CENTER.getName()));
   }
 }

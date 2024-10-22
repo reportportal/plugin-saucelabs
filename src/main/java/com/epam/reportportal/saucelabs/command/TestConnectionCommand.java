@@ -14,35 +14,45 @@
  * limitations under the License.
  */
 
-package com.epam.reportportal.saucelabs;
+package com.epam.reportportal.saucelabs.command;
 
-import static com.epam.reportportal.saucelabs.SaucelabsProperties.DATA_CENTER;
-import static com.epam.reportportal.saucelabs.utils.OldDatacenterResolver.resolveDatacenterDeprecatedName;
+import static com.epam.reportportal.saucelabs.model.Constants.GET_VDC_JOBS;
 
+import com.epam.reportportal.saucelabs.ValidationUtils;
+import com.epam.reportportal.saucelabs.client.RestClientBuilder;
+import com.epam.reportportal.saucelabs.model.SauceProperties;
 import com.epam.ta.reportportal.entity.integration.Integration;
-import com.saucelabs.saucerest.SauceREST;
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
+@Slf4j
 public class TestConnectionCommand implements
     com.epam.reportportal.extension.PluginCommand<Boolean> {
 
-  private final SauceRestClient sauceRestClient;
+  private final RestClientBuilder restClient;
 
-  public TestConnectionCommand(SauceRestClient sauceRestClient) {
-    this.sauceRestClient = sauceRestClient;
+  public TestConnectionCommand(RestClientBuilder restClient) {
+    this.restClient = restClient;
   }
 
   @Override
   public Boolean executeCommand(Integration integration, Map params) {
     ValidationUtils.validateIntegrationParams(integration.getParams());
-    String datacenter = (String) params.get(DATA_CENTER.getName());
-    SauceREST sauce = sauceRestClient.buildSauceClient(integration,
-        resolveDatacenterDeprecatedName(datacenter));
-    return StringUtils.isNotEmpty(sauce.getUsername());
+    SauceProperties sp = new SauceProperties(integration.getParams().getParams());
+    RestTemplate restTemplate = restClient.buildRestTemplate(sp);
+
+    try {
+      String assetsUrl = String.format(GET_VDC_JOBS, sp.getUsername());
+      restTemplate.getForObject(assetsUrl, String.class);
+      return true;
+    } catch (Exception e) {
+      log.error("Test connection failed", e);
+      return false;
+    }
   }
 
   @Override

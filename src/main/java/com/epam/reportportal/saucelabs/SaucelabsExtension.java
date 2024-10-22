@@ -20,6 +20,12 @@ import com.epam.reportportal.extension.CommonPluginCommand;
 import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.extension.ReportPortalExtensionPoint;
 import com.epam.reportportal.saucelabs.client.RestClientBuilder;
+import com.epam.reportportal.saucelabs.command.AssetsCommand;
+import com.epam.reportportal.saucelabs.command.GenerateAuthTokenCommand;
+import com.epam.reportportal.saucelabs.command.GetLogsCommand;
+import com.epam.reportportal.saucelabs.command.GetRealDeviceJobCommand;
+import com.epam.reportportal.saucelabs.command.GetVirtualDeviceJobCommand;
+import com.epam.reportportal.saucelabs.command.TestConnectionCommand;
 import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,53 +42,53 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Extension
 public class SaucelabsExtension implements ReportPortalExtensionPoint {
 
-	private static final String DOCUMENTATION_LINK_FIELD = "documentationLink";
-	private static final String DOCUMENTATION_LINK = "https://reportportal.io/docs/plugins/SauceLabs";
-	static final String JOB_ID = "jobId";
+  private static final String DOCUMENTATION_LINK_FIELD = "documentationLink";
+  private static final String DOCUMENTATION_LINK = "https://reportportal.io/docs/plugins/SauceLabs";
+  static final String JOB_ID = "jobId";
 
-	private final Supplier<Map<String, PluginCommand<?>>> pluginCommandMapping = new MemoizingSupplier<>(this::getCommands);
+  private final Supplier<Map<String, PluginCommand<?>>> pluginCommandMapping = new MemoizingSupplier<>(
+      this::getCommands);
 
-	private final Supplier<SauceRestClient> restClientSupplier;
-	private final Supplier<RestClientBuilder> newRestClientSupplier;
+  private final Supplier<RestClientBuilder> restClientSupplier;
 
-	@Autowired
-	private BasicTextEncryptor basicEncryptor;
+  @Autowired
+  private BasicTextEncryptor basicEncryptor;
 
-	public SaucelabsExtension() {
-		restClientSupplier = new MemoizingSupplier<>(() -> new SauceRestClient(basicEncryptor));
-    newRestClientSupplier = new MemoizingSupplier<>(() -> new RestClientBuilder(basicEncryptor));
-	}
+  public SaucelabsExtension() {
+    restClientSupplier = new MemoizingSupplier<>(() -> new RestClientBuilder(basicEncryptor));
+  }
 
 
-	@Override
-	public Map<String, ?> getPluginParams() {
-		Map<String, Object> params = new HashMap<>();
-		params.put(ALLOWED_COMMANDS, new ArrayList<>(pluginCommandMapping.get().keySet()));
-		params.put(DOCUMENTATION_LINK_FIELD, DOCUMENTATION_LINK);
-		//params.put("dataCenters", Arrays.stream(DataCenter.values()).map(Enum::toString).collect(Collectors.toList()));
-		params.put("dataCenters", Arrays.asList("US", "EU"));
+  @Override
+  public Map<String, ?> getPluginParams() {
+    Map<String, Object> params = new HashMap<>();
+    params.put(ALLOWED_COMMANDS, new ArrayList<>(pluginCommandMapping.get().keySet()));
+    params.put(DOCUMENTATION_LINK_FIELD, DOCUMENTATION_LINK);
+    //params.put("dataCenters", Arrays.stream(DataCenter.values()).map(Enum::toString).collect(Collectors.toList()));
+    params.put("dataCenters", Arrays.asList("US", "EU"));
 
-		return params;
-	}
+    return params;
+  }
 
-	@Override
-	public CommonPluginCommand getCommonCommand(String commandName) {
-		throw new UnsupportedOperationException("Plugin commands are not supported");
-	}
+  @Override
+  public CommonPluginCommand getCommonCommand(String commandName) {
+    throw new UnsupportedOperationException("Plugin commands are not supported");
+  }
 
-	@Override
-	public PluginCommand getIntegrationCommand(String commandName) {
-		return pluginCommandMapping.get().get(commandName);
-	}
+  @Override
+  public PluginCommand getIntegrationCommand(String commandName) {
+    return pluginCommandMapping.get().get(commandName);
+  }
 
-	private Map<String, PluginCommand<?>> getCommands() {
-		return ImmutableMap.<String, PluginCommand<?>>builder()
-        .put("logs", new GetLogsCommand(newRestClientSupplier.get()))
-				.put("jobInfo", new JobInfoCommand(restClientSupplier.get()))
-				.put("testConnection", new TestConnectionCommand(restClientSupplier.get()))
-				.put("assets", new AssetsCommand(newRestClientSupplier.get()))
-				.put("token", new GenerateAuthTokenCommand(basicEncryptor))
-				.build();
+  private Map<String, PluginCommand<?>> getCommands() {
+    return ImmutableMap.<String, PluginCommand<?>>builder()
+        .put("logs", new GetLogsCommand(restClientSupplier.get()))
+        .put("jobInfo", new GetVirtualDeviceJobCommand(restClientSupplier.get()))
+        .put("realDeviceJobInfo", new GetRealDeviceJobCommand(restClientSupplier.get()))
+        .put("testConnection", new TestConnectionCommand(restClientSupplier.get()))
+        .put("assets", new AssetsCommand(restClientSupplier.get()))
+        .put("token", new GenerateAuthTokenCommand(basicEncryptor))
+        .build();
 
-	}
+  }
 }
