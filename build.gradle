@@ -44,7 +44,10 @@ dependencies {
         implementation 'com.github.reportportal:plugin-api:a9a8b73'
         annotationProcessor 'com.github.reportportal:plugin-api:a9a8b73'
     }
-    implementation 'org.hibernate:hibernate-core:6.5.2.Final'
+    implementation 'org.hibernate:hibernate-core:5.6.15.Final'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
 
     // add lombok support
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
@@ -52,6 +55,11 @@ dependencies {
     testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
     testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
+}
+
+test {
+    useJUnitPlatform()
+    onlyIf { Boolean.getBoolean(testsEnabled) } // enable for debugging purposes only
 }
 
 generatePomFileForShadowPublication { pom.packaging = "jar" }
@@ -64,7 +72,7 @@ jar {
                 "Plugin-Version": "${project.version}",
                 "Plugin-Provider": "Pavel Bortnik",
                 "Plugin-Class": "com.epam.reportportal.saucelabs.SaucelabsPlugin",
-//                "Plugin-Dependencies": ""
+                // "Plugin-Dependencies": ""
         )
     }
 }
@@ -73,9 +81,7 @@ shadowJar {
     archiveClassifier.set(null)
     zip64 true
     dependencies {
-//        include(dependency('com.saucelabs:saucerest:2.5.1'))
-
-
+        include(dependency('org.hibernate:hibernate-core:5.6.15.Final'))
     }
 }
 

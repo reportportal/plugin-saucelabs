@@ -21,7 +21,7 @@ import com.epam.ta.reportportal.entity.integration.IntegrationParams;
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
-public enum SaucelabsProperties {
+public enum IntegrationParametersNames {
 
   USERNAME("username"),
   ACCESS_TOKEN("accessToken"),
@@ -29,7 +29,7 @@ public enum SaucelabsProperties {
 
   private final String name;
 
-  SaucelabsProperties(String name) {
+  IntegrationParametersNames(String name) {
     this.name = name;
   }
 

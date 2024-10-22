@@ -1,10 +1,10 @@
 package com.epam.reportportal.saucelabs.command;
 
-import static com.epam.reportportal.saucelabs.model.SaucelabsProperties.ACCESS_TOKEN;
-import static com.epam.reportportal.saucelabs.model.SaucelabsProperties.USERNAME;
-import static com.epam.reportportal.saucelabs.ValidationUtils.validateIntegrationParams;
-import static com.epam.reportportal.saucelabs.ValidationUtils.validateJobId;
 import static com.epam.reportportal.saucelabs.model.Constants.JOB_ID;
+import static com.epam.reportportal.saucelabs.model.IntegrationParametersNames.ACCESS_TOKEN;
+import static com.epam.reportportal.saucelabs.model.IntegrationParametersNames.USERNAME;
+import static com.epam.reportportal.saucelabs.utils.ValidationUtils.validateIntegrationParams;
+import static com.epam.reportportal.saucelabs.utils.ValidationUtils.validateJobId;
 
 import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.rules.exception.ReportPortalException;

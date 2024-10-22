@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.epam.reportportal.saucelabs;
+package com.epam.reportportal.saucelabs.utils;
 
 import static com.epam.reportportal.rules.commons.validation.BusinessRule.expect;
-import static com.epam.reportportal.saucelabs.SaucelabsExtension.JOB_ID;
-import static com.epam.reportportal.saucelabs.model.SaucelabsProperties.ACCESS_TOKEN;
-import static com.epam.reportportal.saucelabs.model.SaucelabsProperties.DATA_CENTER;
-import static com.epam.reportportal.saucelabs.model.SaucelabsProperties.USERNAME;
+import static com.epam.reportportal.saucelabs.model.Constants.JOB_ID;
+import static com.epam.reportportal.saucelabs.model.IntegrationParametersNames.ACCESS_TOKEN;
+import static com.epam.reportportal.saucelabs.model.IntegrationParametersNames.DATA_CENTER;
+import static com.epam.reportportal.saucelabs.model.IntegrationParametersNames.USERNAME;
 
 import com.epam.reportportal.rules.exception.ErrorType;
 import com.epam.ta.reportportal.commons.Predicates;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 EPAM Systems
+ * Copyright 2024 EPAM Systems
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@ import static com.epam.reportportal.saucelabs.model.Constants.GET_RDC_JOB;
 import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.rules.exception.ErrorType;
 import com.epam.reportportal.rules.exception.ReportPortalException;
-import com.epam.reportportal.saucelabs.ValidationUtils;
 import com.epam.reportportal.saucelabs.client.RestClientBuilder;
 import com.epam.reportportal.saucelabs.model.Constants;
-import com.epam.reportportal.saucelabs.model.SauceProperties;
+import com.epam.reportportal.saucelabs.model.IntegrationProperties;
+import com.epam.reportportal.saucelabs.utils.ValidationUtils;
 import com.epam.ta.reportportal.entity.integration.Integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
@@ -53,7 +53,7 @@ public class GetRealDeviceJobCommand implements PluginCommand<Object> {
     ValidationUtils.validateIntegrationParams(integration.getParams());
     ValidationUtils.validateJobId(params);
 
-    SauceProperties sp = new SauceProperties(integration.getParams().getParams());
+    IntegrationProperties sp = new IntegrationProperties(integration.getParams().getParams());
     sp.setJobId((String) params.get(Constants.JOB_ID));
     RestTemplate restTemplate = restClient.buildRestTemplate(sp);
 
@@ -61,7 +61,7 @@ public class GetRealDeviceJobCommand implements PluginCommand<Object> {
       String realDeviceJobUrl = String.format(GET_RDC_JOB, sp.getJobId());
       String jobInfo = restTemplate.getForObject(realDeviceJobUrl, String.class);
 
-      return new ObjectMapper().readValue(jobInfo, Object.class); // try skip mapping
+      return new ObjectMapper().readValue(jobInfo, Object.class);
 
     } catch (HttpClientErrorException httpException) {
       throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,

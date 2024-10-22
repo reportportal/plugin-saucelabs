@@ -18,9 +18,9 @@ package com.epam.reportportal.saucelabs.command;
 
 import static com.epam.reportportal.saucelabs.model.Constants.GET_VDC_JOBS;
 
-import com.epam.reportportal.saucelabs.ValidationUtils;
 import com.epam.reportportal.saucelabs.client.RestClientBuilder;
-import com.epam.reportportal.saucelabs.model.SauceProperties;
+import com.epam.reportportal.saucelabs.model.IntegrationProperties;
+import com.epam.reportportal.saucelabs.utils.ValidationUtils;
 import com.epam.ta.reportportal.entity.integration.Integration;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +42,7 @@ public class TestConnectionCommand implements
   @Override
   public Boolean executeCommand(Integration integration, Map params) {
     ValidationUtils.validateIntegrationParams(integration.getParams());
-    SauceProperties sp = new SauceProperties(integration.getParams().getParams());
+    IntegrationProperties sp = new IntegrationProperties(integration.getParams().getParams());
     RestTemplate restTemplate = restClient.buildRestTemplate(sp);
 
     try {

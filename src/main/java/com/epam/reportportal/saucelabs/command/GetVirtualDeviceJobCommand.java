@@ -21,10 +21,10 @@ import static com.epam.reportportal.saucelabs.model.Constants.GET_VDC_JOB;
 import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.rules.exception.ErrorType;
 import com.epam.reportportal.rules.exception.ReportPortalException;
-import com.epam.reportportal.saucelabs.ValidationUtils;
 import com.epam.reportportal.saucelabs.client.RestClientBuilder;
 import com.epam.reportportal.saucelabs.model.Constants;
-import com.epam.reportportal.saucelabs.model.SauceProperties;
+import com.epam.reportportal.saucelabs.model.IntegrationProperties;
+import com.epam.reportportal.saucelabs.utils.ValidationUtils;
 import com.epam.ta.reportportal.entity.integration.Integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
@@ -52,19 +52,19 @@ public class GetVirtualDeviceJobCommand implements PluginCommand<Object> {
     ValidationUtils.validateIntegrationParams(integration.getParams());
     ValidationUtils.validateJobId(params);
 
-    SauceProperties sp = new SauceProperties(integration.getParams().getParams());
+    IntegrationProperties sp = new IntegrationProperties(integration.getParams().getParams());
     sp.setJobId((String) params.get(Constants.JOB_ID));
     RestTemplate restTemplate = restClient.buildRestTemplate(sp);
 
     try {
-      String realDeviceJobUrl = String.format(GET_VDC_JOB, sp.getUsername(), sp.getJobId());
-      String jobInfo = restTemplate.getForObject(realDeviceJobUrl, String.class);
+      String virtualDeviceJobUrl = String.format(GET_VDC_JOB, sp.getUsername(), sp.getJobId());
+      String jobInfo = restTemplate.getForObject(virtualDeviceJobUrl, String.class);
 
-      return new ObjectMapper().readValue(jobInfo, Object.class); // try skip mapping
+      return new ObjectMapper().readValue(jobInfo, Object.class);
 
     } catch (HttpClientErrorException httpException) {
       throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
-          StringUtils.normalizeSpace("Failed to retrieve real device job info"));
+          StringUtils.normalizeSpace("Failed to retrieve virtual device job info"));
     }
   }
 
