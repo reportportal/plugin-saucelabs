@@ -22,12 +22,10 @@ sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
 repositories {
-    maven { url "https://m2proxy.atlassian.com/repository/public" }
-    mavenCentral { url "https://repo1.maven.org/maven2" }
-
     if (!releaseMode) {
         maven { url 'https://jitpack.io' }
     }
+    mavenCentral { url "https://repo1.maven.org/maven2" }
 }
 
 dependencyManagement {
@@ -48,12 +46,8 @@ dependencies {
     }
     implementation 'org.hibernate:hibernate-core:5.6.15.Final'
 
-    // TODO: 2.5.3+ switched to camel-case models. UI updates required
-    implementation 'com.saucelabs:saucerest:2.5.1'
-    implementation 'dev.failsafe:failsafe:3.3.2'
-    implementation 'org.awaitility:awaitility:4.2.2'
-    implementation 'org.hamcrest:hamcrest-core:2.2'
-    runtimeOnly 'com.squareup.moshi:moshi:1.15.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
 
     // add lombok support
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
@@ -61,6 +55,11 @@ dependencies {
     testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
     testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
+}
+
+test {
+    useJUnitPlatform()
+    onlyIf { Boolean.getBoolean(testsEnabled) } // enable for debugging purposes only
 }
 
 generatePomFileForShadowPublication { pom.packaging = "jar" }
@@ -73,7 +72,7 @@ jar {
                 "Plugin-Version": "${project.version}",
                 "Plugin-Provider": "Pavel Bortnik",
                 "Plugin-Class": "com.epam.reportportal.saucelabs.SaucelabsPlugin",
-//                "Plugin-Dependencies": ""
+                // "Plugin-Dependencies": ""
         )
     }
 }
@@ -82,13 +81,7 @@ shadowJar {
     archiveClassifier.set(null)
     zip64 true
     dependencies {
-        include(dependency('com.saucelabs:saucerest:2.5.1'))
-        include(dependency('org.json:json:20240303'))
-        include(dependency('org.awaitility:awaitility:4.2.2'))
-        include(dependency('org.hamcrest:hamcrest:2.2'))
-        include(dependency('com.squareup.moshi:moshi:1.15.1'))
-        include(dependency('net.jodah:failsafe:2.4.4'))
-
+        include(dependency('org.hibernate:hibernate-core:5.6.15.Final'))
     }
 }
 
