@@ -59,7 +59,6 @@ dependencies {
 
 test {
     useJUnitPlatform()
-    onlyIf { Boolean.getBoolean(testsEnabled) } // enable for debugging purposes only
 }
 
 generatePomFileForShadowPublication { pom.packaging = "jar" }
