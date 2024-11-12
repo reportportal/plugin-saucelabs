@@ -20,10 +20,10 @@ package com.epam.reportportal.saucelabs.model;
 public class Constants {
 
   public static final String JOB_ID = "jobId";
-  public static final String LOG_URL = "log_url";
+  public static final String LOG_URL = "sauce-log";
 
   // endpoints
-  public static final String GET_VDC_JOBS = "/rest/v1/%s/jobs";
+  public static final String TEST_CONNECTION = "/rest/v1/%s/jobs?limit=0";
   public static final String GET_VDC_JOB = "/rest/v1/%s/jobs/%s";
   public static final String GET_VDC_JOB_LOGS = "/rest/v1/%s/jobs/%s/assets/log.json";
   public static final String GET_VDC_JOB_ASSETS = "/rest/v1/%s/jobs/%s/assets";

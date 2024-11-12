@@ -16,7 +16,7 @@
 
 package com.epam.reportportal.saucelabs.command;
 
-import static com.epam.reportportal.saucelabs.model.Constants.GET_VDC_JOBS;
+import static com.epam.reportportal.saucelabs.model.Constants.TEST_CONNECTION;
 
 import com.epam.reportportal.saucelabs.client.RestClientBuilder;
 import com.epam.reportportal.saucelabs.model.IntegrationProperties;
@@ -46,7 +46,7 @@ public class TestConnectionCommand implements
     RestTemplate restTemplate = restClient.buildRestTemplate(sp);
 
     try {
-      String assetsUrl = String.format(GET_VDC_JOBS, sp.getUsername());
+      String assetsUrl = String.format(TEST_CONNECTION, sp.getUsername());
       restTemplate.getForObject(assetsUrl, String.class);
       return true;
     } catch (Exception e) {
