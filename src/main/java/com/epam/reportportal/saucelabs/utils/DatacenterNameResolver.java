@@ -18,17 +18,16 @@ package com.epam.reportportal.saucelabs.utils;
 
 import com.epam.reportportal.rules.exception.ErrorType;
 import com.epam.reportportal.rules.exception.ReportPortalException;
-import com.saucelabs.saucerest.DataCenter;
+import com.epam.reportportal.saucelabs.model.DataCenter;
 
 /**
  * Utility class for resolving deprecated datacenter names to their current equivalents. This is the
  * temporary workaround in order to mitigate inconsistency between saved integrations and saucelabs
  * rest client {@link DataCenter} Enum.
  */
-// TODO: migrate integration old values and remove this class
-public class OldDatacenterResolver {
+public class DatacenterNameResolver {
 
-  private OldDatacenterResolver() {
+  private DatacenterNameResolver() {
   }
 
   /**
@@ -38,14 +37,16 @@ public class OldDatacenterResolver {
    * @return the current datacenter name
    * @throws ReportPortalException if the datacenter name is invalid
    */
-  public static DataCenter resolveDatacenterDeprecatedName(String oldDatacenter) {
+  public static DataCenter resolveDatacenterName(String oldDatacenter) {
     switch (oldDatacenter) {
       case "EU":
       case "EU_CENTRAL":
-        return DataCenter.EU_CENTRAL;
+        return DataCenter.EU;
       case "US":
       case "US_WEST":
-        return DataCenter.US_WEST;
+        return DataCenter.US;
+      case "US_EAST":
+        return DataCenter.US_EAST;
       default:
         throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
             "Invalid SauceLabs Datacenter value");

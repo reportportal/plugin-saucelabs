@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.epam.reportportal.saucelabs;
+package com.epam.reportportal.saucelabs.utils;
 
 import static com.epam.reportportal.rules.commons.validation.BusinessRule.expect;
-import static com.epam.reportportal.saucelabs.SaucelabsExtension.JOB_ID;
-import static com.epam.reportportal.saucelabs.SaucelabsProperties.ACCESS_TOKEN;
-import static com.epam.reportportal.saucelabs.SaucelabsProperties.DATA_CENTER;
-import static com.epam.reportportal.saucelabs.SaucelabsProperties.USERNAME;
+import static com.epam.reportportal.saucelabs.model.Constants.JOB_ID;
+import static com.epam.reportportal.saucelabs.model.IntegrationParametersNames.ACCESS_TOKEN;
+import static com.epam.reportportal.saucelabs.model.IntegrationParametersNames.DATA_CENTER;
+import static com.epam.reportportal.saucelabs.model.IntegrationParametersNames.USERNAME;
 
 import com.epam.reportportal.rules.exception.ErrorType;
 import com.epam.ta.reportportal.commons.Predicates;
@@ -34,7 +34,7 @@ public class ValidationUtils {
 
   public static final String IS_NOT_SPECIFIED = " is not specified.";
 
-  public static void validateParams(Map params) {
+  public static void validateJobId(Map<String, Object> params) {
     expect(params.get(JOB_ID), Predicates.notNull()).verify(
         ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, JOB_ID + " parameter should be provided");
   }
@@ -44,7 +44,7 @@ public class ValidationUtils {
     expect(integrationParams.getParams(), Predicates.notNull()).verify(
         ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, "Integration parameters shouldn't be empty");
 
-    Map params = integrationParams.getParams();
+    Map<String, Object> params = integrationParams.getParams();
     expect(params.get(USERNAME.getName()), Predicates.notNull()).verify(
         ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, USERNAME + IS_NOT_SPECIFIED);
 
