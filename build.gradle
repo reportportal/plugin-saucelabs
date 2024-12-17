@@ -82,7 +82,7 @@ shadowJar {
     archiveClassifier.set(null)
     zip64 true
     dependencies {
-        include(dependency('org.hibernate:hibernate-core:5.6.15.Final'))
+        include(dependency('com.epam.reportportal:saucelabs:.*'))
     }
 }
 
