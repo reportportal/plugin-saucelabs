@@ -16,6 +16,7 @@
 
 package com.epam.reportportal.saucelabs.command;
 
+import static com.epam.reportportal.saucelabs.model.Constants.GET_RDC_JOB;
 import static com.epam.reportportal.saucelabs.model.Constants.GET_VDC_JOB;
 
 import com.epam.reportportal.extension.PluginCommand;
@@ -63,8 +64,16 @@ public class GetVirtualDeviceJobCommand implements PluginCommand<Object> {
       return new ObjectMapper().readValue(jobInfo, Object.class);
 
     } catch (HttpClientErrorException httpException) {
-      throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
-          StringUtils.normalizeSpace("Failed to retrieve virtual device job info"));
+      try {
+        String realDeviceJobUrl = String.format(GET_RDC_JOB, sp.getJobId());
+        String jobInfo = restTemplate.getForObject(realDeviceJobUrl, String.class);
+
+        return new ObjectMapper().readValue(jobInfo, Object.class);
+      } catch (HttpClientErrorException realDeviceException) {
+
+        throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
+            StringUtils.normalizeSpace("Failed to retrieve job info"));
+      }
     }
   }
 

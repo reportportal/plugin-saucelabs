@@ -33,6 +33,8 @@ import java.util.Map;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jooq.tools.json.JSONArray;
+import org.jooq.tools.json.JSONObject;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -69,9 +71,19 @@ public class AssetsCommand implements PluginCommand<Object> {
       return new ObjectMapper().readValue(jsonElement.toString(), Object.class); // try skip mapping
 
     } catch (HttpClientErrorException httpException) {
-
-      throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
-          StringUtils.normalizeSpace("Failed to retrieve job assets"));
+      try {
+        JSONObject response = new JSONObject();
+        response.put("assetsPrefix",
+            String.format("%s/v1/rdc/jobs/%s/", sp.getDatacenter().getBaseUrl(), sp.getJobId()));
+        response.put("screenshots", new JSONArray());
+        response.put("sauce-log",
+            String.format("%s/v1/rdc/jobs/%s/deviceLogs", sp.getDatacenter().getBaseUrl(),
+                sp.getJobId()));
+        return new ObjectMapper().readValue(response.toString(), Object.class);
+      } catch (Exception httpException2) {
+        throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
+            StringUtils.normalizeSpace("Failed to retrieve job assets"));
+      }
     }
   }
 
