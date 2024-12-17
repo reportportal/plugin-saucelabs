@@ -16,6 +16,7 @@
 
 package com.epam.reportportal.saucelabs.command;
 
+import static com.epam.reportportal.saucelabs.model.Constants.GET_RDC_LOGS;
 import static com.epam.reportportal.saucelabs.model.Constants.GET_VDC_JOB_ASSETS;
 import static com.epam.reportportal.saucelabs.model.Constants.GET_VDC_JOB_LOGS;
 import static com.epam.reportportal.saucelabs.model.Constants.JOB_ID;
@@ -28,9 +29,11 @@ import com.epam.reportportal.saucelabs.client.RestClientBuilder;
 import com.epam.reportportal.saucelabs.model.IntegrationProperties;
 import com.epam.reportportal.saucelabs.utils.ValidationUtils;
 import com.epam.ta.reportportal.entity.integration.Integration;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.util.Map;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
@@ -48,6 +51,7 @@ public class GetLogsCommand implements PluginCommand<Object> {
     this.restClient = restClient;
   }
 
+  @SneakyThrows
   @Override
   public Object executeCommand(Integration integration, Map<String, Object> params) {
     ValidationUtils.validateJobId(params);
@@ -69,8 +73,15 @@ public class GetLogsCommand implements PluginCommand<Object> {
       String logsUrl = String.format(GET_VDC_JOB_LOGS, sp.getUsername(), sp.getJobId());
       return restTemplate.getForObject(logsUrl, Object.class);
     } catch (HttpClientErrorException httpException) {
-      throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
-          StringUtils.normalizeSpace("Failed to retrieve job assets"));
+      try {
+        String realDeviceJobUrl = String.format(GET_RDC_LOGS, sp.getJobId());
+        String jobInfo = restTemplate.getForObject(realDeviceJobUrl, String.class);
+
+        return new ObjectMapper().readValue(jobInfo, Object.class);
+      } catch (HttpClientErrorException rdcException) {
+        throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
+            StringUtils.normalizeSpace("Failed to retrieve job logs"));
+      }
     }
 
   }
