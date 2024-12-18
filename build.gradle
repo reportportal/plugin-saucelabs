@@ -1,5 +1,5 @@
 plugins {
-    id "io.spring.dependency-management" version "1.0.9.RELEASE"
+    id "io.spring.dependency-management" version "1.1.4"
     id 'java'
 }
 
@@ -16,13 +16,13 @@ def scriptsUrl = 'https://raw.githubusercontent.com/reportportal/gradle-scripts/
 
 apply from: scriptsUrl + '/release-fat.gradle'
 apply from: scriptsUrl + '/signing.gradle'
-apply from: scriptsUrl + '/build-quality.gradle'
 
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
 
 repositories {
-    maven { url "https://m2proxy.atlassian.com/repository/public" }
     mavenCentral { url "https://repo1.maven.org/maven2" }
 
     if (!releaseMode) {
@@ -32,7 +32,7 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom(releaseMode ? 'com.epam.reportportal:commons-bom:' + getProperty('bom.version') : 'com.epam.reportportal:commons-bom:5.12.1')
+        mavenBom(releaseMode ? 'com.epam.reportportal:commons-bom:' + getProperty('bom.version') : 'com.epam.reportportal:commons-bom:5.13.0')
     }
 }
 
@@ -42,18 +42,14 @@ dependencies {
         implementation 'com.epam.reportportal:plugin-api'
         annotationProcessor 'com.epam.reportportal:plugin-api'
     } else {
-        implementation 'com.github.reportportal:commons-dao:acf1ec7'
-        implementation 'com.github.reportportal:plugin-api:188792e'
-        annotationProcessor 'com.github.reportportal:plugin-api:188792e'
+        implementation 'com.github.reportportal:commons-dao:a98c172'
+        implementation 'com.github.reportportal:plugin-api:develop-SNAPSHOT'
+        annotationProcessor 'com.github.reportportal:plugin-api:develop-SNAPSHOT'
     }
     implementation 'org.hibernate:hibernate-core:5.6.15.Final'
 
-    // TODO: 2.5.3+ switched to camel-case models. UI updates required
-    implementation 'com.saucelabs:saucerest:2.5.1'
-    implementation 'dev.failsafe:failsafe:3.3.2'
-    implementation 'org.awaitility:awaitility:4.2.2'
-    implementation 'org.hamcrest:hamcrest-core:2.2'
-    runtimeOnly 'com.squareup.moshi:moshi:1.15.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
 
     // add lombok support
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
@@ -63,17 +59,21 @@ dependencies {
 
 }
 
+test {
+    useJUnitPlatform()
+}
+
 generatePomFileForShadowPublication { pom.packaging = "jar" }
 
 jar {
     manifest {
         attributes(
-                "Class-Path": configurations.compile.collect { it.getName() }.join(' '),
-                "Plugin-Id": "${pluginID}",
+                "Class-Path": configurations.compileClasspath.collect { it.getName() }.join(' '),
+                "Plugin-Id": "${pluginId}",
                 "Plugin-Version": "${project.version}",
                 "Plugin-Provider": "Pavel Bortnik",
                 "Plugin-Class": "com.epam.reportportal.saucelabs.SaucelabsPlugin",
-//                "Plugin-Dependencies": ""
+                // "Plugin-Dependencies": ""
         )
     }
 }
@@ -82,25 +82,19 @@ shadowJar {
     archiveClassifier.set(null)
     zip64 true
     dependencies {
-        include(dependency('com.saucelabs:saucerest:2.5.1'))
-        include(dependency('org.json:json:20240303'))
-        include(dependency('org.awaitility:awaitility:4.2.2'))
-        include(dependency('org.hamcrest:hamcrest:2.2'))
-        include(dependency('com.squareup.moshi:moshi:1.15.1'))
-        include(dependency('net.jodah:failsafe:2.4.4'))
-
+        include(dependency('com.epam.reportportal:saucelabs:.*'))
     }
 }
 
 task plugin(type: Jar) {
-    baseName = "plugin-${pluginID}"
+    getArchiveBaseName().set("plugin-${pluginId}")
     into('classes') {
         with jar
     }
     into('lib') {
-        from configurations.compile
+        from configurations.compileClasspath
     }
-    extension('zip')
+    archiveExtension.set('zip')
 }
 
 task assemblePlugin(type: Copy) {
@@ -113,5 +107,5 @@ task assemblePlugins(type: Copy) {
 }
 
 wrapper {
-    gradleVersion = '6.0'
+    gradleVersion = '8.10.2'
 }

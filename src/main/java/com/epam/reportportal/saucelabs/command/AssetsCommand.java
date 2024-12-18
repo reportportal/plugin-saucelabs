@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package com.epam.reportportal.saucelabs;
+package com.epam.reportportal.saucelabs.command;
 
-import static com.epam.reportportal.saucelabs.SaucelabsExtension.JOB_ID;
+import static com.epam.reportportal.saucelabs.model.Constants.GET_VDC_JOB_ASSETS;
+import static com.epam.reportportal.saucelabs.model.Constants.JOB_ID;
 
 import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.rules.exception.ErrorType;
 import com.epam.reportportal.rules.exception.ReportPortalException;
 import com.epam.reportportal.saucelabs.client.RestClientBuilder;
-import com.epam.reportportal.saucelabs.model.SauceProperties;
+import com.epam.reportportal.saucelabs.model.IntegrationProperties;
+import com.epam.reportportal.saucelabs.utils.ValidationUtils;
 import com.epam.ta.reportportal.entity.integration.Integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.saucelabs.saucerest.MoshiSingleton;
-import com.saucelabs.saucerest.model.jobs.JobAssets;
-import com.squareup.moshi.JsonAdapter;
-import com.squareup.moshi.Moshi;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.util.Map;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.jooq.tools.json.JSONArray;
+import org.jooq.tools.json.JSONObject;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -54,39 +54,33 @@ public class AssetsCommand implements PluginCommand<Object> {
   @SneakyThrows
   @Override
   public Object executeCommand(Integration integration, Map<String, Object> params) {
-    ValidationUtils.validateParams(params);
     ValidationUtils.validateIntegrationParams(integration.getParams());
+    ValidationUtils.validateJobId(params);
 
-    SauceProperties sp = new SauceProperties(integration.getParams().getParams());
+    IntegrationProperties sp = new IntegrationProperties(integration.getParams().getParams());
     sp.setJobId((String) params.get(JOB_ID));
     RestTemplate restTemplate = restClient.buildRestTemplate(sp);
 
     try {
-      String url = "/rest/v1/" + sp.getUsername() + "/jobs/" + sp.getJobId() + "/assets";
-      String jobAssets = restTemplate.getForObject(url, String.class);
+      String assetsUrl = String.format(GET_VDC_JOB_ASSETS, sp.getUsername(), sp.getJobId());
+      String jobAssets = restTemplate.getForObject(assetsUrl, String.class);
 
-      JSONObject response = new JSONObject(jobAssets);
-      response.put("assetsPrefix",
-          sp.getDatacenter().apiServer + "rest/v1/" + sp.getUsername() + "/jobs/" + sp.getJobId()
-              + "/assets");
-      return new ObjectMapper().readValue(response.toString(), Object.class);
+      JsonObject jsonElement = (JsonObject) JsonParser.parseString(jobAssets);
+      jsonElement.addProperty("assetsPrefix", sp.getDatacenter().getBaseUrl() + assetsUrl);
+
+      return new ObjectMapper().readValue(jsonElement.toString(), Object.class); // try skip mapping
 
     } catch (HttpClientErrorException httpException) {
-      if (httpException.getStatusCode().is4xxClientError()) {
-        // TODO: handle RD endpoint in a separate plugin command. UI updates required
-        //String url = sp.getDatacenter().apiServer + "v1/rdc/jobs/" + sp.getJobId();
-        //DeviceJob deviceJob = restTemplate.getForObject(url, DeviceJob.class);
-
+      try {
         JSONObject response = new JSONObject();
         response.put("assetsPrefix",
-            String.format("%sv1/rdc/jobs/%s/", sp.getDatacenter().apiServer, sp.getJobId()));
+            String.format("%s/v1/rdc/jobs/%s/", sp.getDatacenter().getBaseUrl(), sp.getJobId()));
         response.put("screenshots", new JSONArray());
         response.put("sauce-log",
-            String.format("%sv1/rdc/jobs/%s/deviceLogs", sp.getDatacenter().apiServer,
+            String.format("%s/v1/rdc/jobs/%s/deviceLogs", sp.getDatacenter().getBaseUrl(),
                 sp.getJobId()));
         return new ObjectMapper().readValue(response.toString(), Object.class);
-
-      } else {
+      } catch (Exception httpException2) {
         throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
             StringUtils.normalizeSpace("Failed to retrieve job assets"));
       }
@@ -98,11 +92,4 @@ public class AssetsCommand implements PluginCommand<Object> {
     return "assets";
   }
 
-
-  public String toJson(JobAssets jobAssets) {
-    Moshi moshi = MoshiSingleton.getInstance();
-
-    JsonAdapter<JobAssets> jsonAdapter = moshi.adapter(JobAssets.class).nonNull();
-    return jsonAdapter.toJson(jobAssets);
-  }
 }
