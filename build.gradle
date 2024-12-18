@@ -79,7 +79,6 @@ jar {
 }
 
 shadowJar {
-    archiveClassifier.set(null)
     zip64 true
     dependencies {
         include(dependency('com.epam.reportportal:saucelabs:.*'))
