@@ -32,7 +32,7 @@ import java.util.Map;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -63,13 +63,13 @@ public class GetVirtualDeviceJobCommand implements PluginCommand<Object> {
 
       return new ObjectMapper().readValue(jobInfo, Object.class);
 
-    } catch (HttpClientErrorException httpException) {
+    } catch (RestClientException httpException) {
       try {
         String realDeviceJobUrl = String.format(GET_RDC_JOB, sp.getJobId());
         String jobInfo = restTemplate.getForObject(realDeviceJobUrl, String.class);
 
         return new ObjectMapper().readValue(jobInfo, Object.class);
-      } catch (HttpClientErrorException realDeviceException) {
+      } catch (RestClientException realDeviceException) {
 
         throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
             StringUtils.normalizeSpace("Failed to retrieve job info"));
