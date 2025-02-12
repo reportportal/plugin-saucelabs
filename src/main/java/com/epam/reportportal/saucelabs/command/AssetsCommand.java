@@ -35,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.tools.json.JSONArray;
 import org.jooq.tools.json.JSONObject;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -70,7 +70,7 @@ public class AssetsCommand implements PluginCommand<Object> {
 
       return new ObjectMapper().readValue(jsonElement.toString(), Object.class); // try skip mapping
 
-    } catch (HttpClientErrorException httpException) {
+    } catch (RestClientException httpException) {
       try {
         JSONObject response = new JSONObject();
         response.put("assetsPrefix",
