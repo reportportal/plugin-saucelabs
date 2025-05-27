@@ -48,6 +48,10 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
   private static final String DOCUMENTATION_LINK_FIELD = "documentationLink";
   private static final String DOCUMENTATION_LINK = "https://reportportal.io/docs/plugins/SauceLabs";
 
+  private static final String NAME_FIELD = "name";
+
+  private static final String PLUGIN_NAME = "Sauce Labs";
+
   private final Supplier<Map<String, PluginCommand<?>>> pluginCommandMapping = new MemoizingSupplier<>(
       this::getCommands);
 
@@ -66,9 +70,7 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
     Map<String, Object> params = new HashMap<>();
     params.put(ALLOWED_COMMANDS, new ArrayList<>(pluginCommandMapping.get().keySet()));
     params.put(DOCUMENTATION_LINK_FIELD, DOCUMENTATION_LINK);
-    /*params.put("dataCenters", Arrays.stream(DataCenter.values())
-        .map(Enum::toString)
-        .collect(toList()));*/
+    params.put(NAME_FIELD, PLUGIN_NAME);
     params.put("dataCenters", Arrays.asList("US", "EU", "US_EAST"));
 
     return params;
