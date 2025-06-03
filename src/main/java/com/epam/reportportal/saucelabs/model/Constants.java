@@ -23,7 +23,7 @@ public class Constants {
   public static final String LOG_URL = "sauce-log";
 
   // endpoints
-  public static final String TEST_CONNECTION = "/rest/v1/%s/jobs?limit=0";
+  public static final String TEST_CONNECTION = "/team-management/v1/teams";
   public static final String GET_VDC_JOB = "/rest/v1/%s/jobs/%s";
   public static final String GET_VDC_JOB_LOGS = "/rest/v1/%s/jobs/%s/assets/log.json";
   public static final String GET_VDC_JOB_ASSETS = "/rest/v1/%s/jobs/%s/assets";
