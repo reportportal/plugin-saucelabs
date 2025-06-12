@@ -18,12 +18,16 @@ package com.epam.reportportal.saucelabs.command;
 
 import static com.epam.reportportal.saucelabs.model.Constants.TEST_CONNECTION;
 
+import com.epam.reportportal.rules.exception.ErrorType;
+import com.epam.reportportal.rules.exception.ReportPortalException;
 import com.epam.reportportal.saucelabs.client.RestClientBuilder;
 import com.epam.reportportal.saucelabs.model.IntegrationProperties;
 import com.epam.reportportal.saucelabs.utils.ValidationUtils;
 import com.epam.ta.reportportal.entity.integration.Integration;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -47,11 +51,17 @@ public class TestConnectionCommand implements
 
     try {
       String assetsUrl = String.format(TEST_CONNECTION, sp.getUsername());
-      restTemplate.getForObject(assetsUrl, String.class);
-      return true;
+      ResponseEntity<String> forObject = restTemplate.exchange(assetsUrl, HttpMethod.GET, null, String.class);
+      if (forObject.getStatusCode().is2xxSuccessful()) {
+        return true;
+      } else {
+        throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
+            "Connection refused.");
+      }
     } catch (Exception e) {
       log.error("Test connection failed", e);
-      return false;
+      throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
+          "Connection refused.");
     }
   }
 
