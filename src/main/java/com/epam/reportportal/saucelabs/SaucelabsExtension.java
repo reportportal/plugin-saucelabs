@@ -50,7 +50,7 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
 
   private static final String NAME_FIELD = "name";
 
-  private static final String PLUGIN_NAME = "sauce labs";
+  private static final String PLUGIN_NAME = "Sauce Labs";
 
   private final Supplier<Map<String, PluginCommand<?>>> pluginCommandMapping = new MemoizingSupplier<>(
       this::getCommands);
