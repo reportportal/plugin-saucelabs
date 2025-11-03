@@ -46,14 +46,14 @@ jobs:
         run: ./gradlew build
 
       - name: Configure AWS credentials
-        if: github.ref_name == 'develop'
+        if: github.ref_name == 'develop' || github.ref_name == 'feature/EPMRPP-109184'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::334301710522:role/GitHubActions-reportportal-deploy
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Upload plugin artifact to S3
-        if: github.ref_name == 'develop'
+        if: github.ref_name == 'develop' || github.ref_name == 'feature/EPMRPP-109184'
         run: |
           PLUGIN_NAME=$(basename "${GITHUB_REPOSITORY}")
           aws s3 cp build/libs/*.jar \
