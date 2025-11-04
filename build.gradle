@@ -27,7 +27,17 @@ repositories {
 
     if (!releaseMode) {
         maven { url 'https://jitpack.io' }
+
+        maven {
+            url = uri("https://maven.pkg.github.com/reportportal/*")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
+
+    
 }
 
 dependencyManagement {
