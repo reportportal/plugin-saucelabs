@@ -23,6 +23,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -45,7 +46,7 @@ jobs:
 
       - name: Build with Gradle
         id: build
-        run: ./gradlew build
+        run: ./gradlew build --stacktrace
 
       - name: Configure AWS credentials
         if: github.ref_name == 'develop' || github.ref_name == 'feature/EPMRPP-109184'

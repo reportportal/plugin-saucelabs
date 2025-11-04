@@ -23,22 +23,10 @@ java {
 }
 
 repositories {
-    mavenCentral { url "https://repo1.maven.org/maven2" }
-
-    if (!releaseMode) {
-        maven { url 'https://jitpack.io' }
-
-        maven {
-            url = uri("https://maven.pkg.github.com/reportportal/*")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GH_PACKAGES_TOKEN") ?: System.getenv("GITHUB_TOKEN")
-            }
-        }
-    }
-
-    
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
+
 
 dependencyManagement {
     imports {
