@@ -59,5 +59,7 @@ jobs:
         if: github.ref_name == 'develop' || github.ref_name == 'feature/EPMRPP-109184'
         run: |
           PLUGIN_NAME=$(basename "${GITHUB_REPOSITORY}")
-          aws s3 cp build/libs/*.jar \
-            s3://${{ secrets.S3_PLUGIN_BUCKET }}/${PLUGIN_NAME}/${{ github.ref_name }}/build-${{ github.run_number }}/
+          aws s3 cp build/libs/ \
+            s3://${{ secrets.S3_PLUGIN_BUCKET }}/${PLUGIN_NAME}/${{ github.ref_name }}/build-${{ github.run_number }}/ \
+            --recursive --exclude "*" --include "*.jar"
+
