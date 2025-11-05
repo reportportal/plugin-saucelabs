@@ -51,7 +51,7 @@ jobs:
       # 🔁 Reusable upload step
       - name: Upload plugin artifact to S3
         if: github.ref_name == 'develop' || startsWith(github.ref_name, 'feature/')
-        uses: ./.github/workflows/upload-plugin-artifact.yaml
+        uses: reportportal/.github/.github/workflows/upload-plugin-artifact.yaml@main
         with:
           plugin_name: ${{ github.event.repository.name }}
           branch_name: ${{ github.ref_name }}
