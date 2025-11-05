@@ -22,7 +22,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -44,15 +43,30 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build with Gradle
-        id: build
         run: ./gradlew build --stacktrace
+
+      # ✅ Upload artifacts for next job
+      - name: Upload JAR artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: built-jars
+          path: build/libs/*.jar
 
 
   upload:
     needs: build
     if: github.ref_name == 'develop' || startsWith(github.ref_name, 'feature/')
-    uses: reportportal/.github/.github/workflows/upload-plugin-artifact.yaml@main
-    with:
-      plugin_name: ${{ github.event.repository.name }}
-      branch_name: ${{ github.ref_name }}
-      run_number: ${{ github.run_number }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download JARs from previous job
+        uses: actions/download-artifact@v4
+        with:
+          name: built-jars
+          path: build/libs/
+
+      - name: Upload plugin artifact to S3
+        uses: reportportal/.github/.github/workflows/upload-plugin-artifact.yaml@main
+        with:
+          plugin_name: ${{ github.event.repository.name }}
+          branch_name: ${{ github.ref_name }}
+          run_number: "${{ github.run_number }}"
