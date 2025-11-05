@@ -7,7 +7,6 @@ on:
     branches:
       - master
       - develop
-      - feature/**
     paths-ignore:
       - '.github/**'
       - README.md
@@ -48,11 +47,12 @@ jobs:
         id: build
         run: ./gradlew build --stacktrace
 
-      # ✅ Reuse centralized upload workflow
-      - name: Upload plugin artifact to S3
-        if: github.ref_name == 'develop' || startsWith(github.ref_name, 'feature/')
-        uses: reportportal/.github/.github/workflows/upload-plugin-artifact.yaml@main
-        with:
-          plugin_name: ${{ github.event.repository.name }}
-          branch_name: ${{ github.ref_name }}
-          run_number: ${{ github.run_number }}
+
+  upload:
+    needs: build
+    if: github.ref_name == 'develop' || startsWith(github.ref_name, 'feature/')
+    uses: reportportal/.github/.github/workflows/upload-plugin-artifact.yaml@main
+    with:
+      plugin_name: ${{ github.event.repository.name }}
+      branch_name: ${{ github.ref_name }}
+      run_number: ${{ github.run_number }}
