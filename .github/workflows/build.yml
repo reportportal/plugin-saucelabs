@@ -61,3 +61,4 @@ jobs:
       plugin_name: ${{ github.event.repository.name }}
       branch_name: ${{ github.ref_name }}
       run_number: "${{ github.run_number }}"
+    secrets: inherit
