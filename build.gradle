@@ -23,12 +23,12 @@ java {
 }
 
 repositories {
-    mavenCentral { url "https://repo1.maven.org/maven2" }
-
+    mavenCentral()
     if (!releaseMode) {
         maven { url 'https://jitpack.io' }
     }
 }
+
 
 dependencyManagement {
     imports {
@@ -44,9 +44,9 @@ dependencies {
         implementation 'com.epam.reportportal:plugin-api'
         annotationProcessor 'com.epam.reportportal:plugin-api'
     } else {
-        implementation 'com.github.reportportal:commons-dao:9b8b695'
-        implementation 'com.github.reportportal:plugin-api:f59b724'
-        annotationProcessor 'com.github.reportportal:plugin-api:f59b724'
+        implementation 'com.github.reportportal:commons-dao:develop-SNAPSHOT'
+        implementation 'com.github.reportportal:plugin-api:develop-SNAPSHOT'
+        annotationProcessor 'com.github.reportportal:plugin-api:develop-SNAPSHOT'
     }
 
     implementation("org.apache.httpcomponents.client5:httpclient5:5.4.2") // supports gzip encoding
