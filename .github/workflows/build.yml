@@ -15,7 +15,7 @@ on:
 permissions:
   id-token: write
   contents: read
-  actions: write
+  actions: read
 
 
 env:
@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
 
       - name: Set up JDK 21
         uses: actions/setup-java@v2
@@ -53,6 +53,7 @@ jobs:
         with:
           name: build-libs
           path: build/libs/*.jar
+          retention-days: 1
 
 
   upload:
