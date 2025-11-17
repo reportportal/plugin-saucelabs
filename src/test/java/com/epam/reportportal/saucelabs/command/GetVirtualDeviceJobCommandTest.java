@@ -20,7 +20,7 @@ package com.epam.reportportal.saucelabs.command;
 import static com.epam.reportportal.saucelabs.model.Constants.JOB_ID;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.epam.reportportal.rules.exception.ReportPortalException;
+import com.epam.reportportal.infrastructure.rules.exception.ReportPortalException;
 import com.epam.reportportal.saucelabs.client.RestClientBuilder;
 import java.util.HashMap;
 import java.util.Map;
