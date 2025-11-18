@@ -16,14 +16,14 @@
 
 package com.epam.reportportal.saucelabs.utils;
 
-import com.epam.reportportal.rules.exception.ErrorType;
-import com.epam.reportportal.rules.exception.ReportPortalException;
+import com.epam.reportportal.infrastructure.rules.exception.ErrorType;
+import com.epam.reportportal.infrastructure.rules.exception.ReportPortalException;
 import com.epam.reportportal.saucelabs.model.DataCenter;
 
 /**
- * Utility class for resolving deprecated datacenter names to their current equivalents. This is the
- * temporary workaround in order to mitigate inconsistency between saved integrations and saucelabs
- * rest client {@link DataCenter} Enum.
+ * Utility class for resolving deprecated datacenter names to their current equivalents. This is the temporary
+ * workaround in order to mitigate inconsistency between saved integrations and saucelabs rest client {@link DataCenter}
+ * Enum.
  */
 public class DatacenterNameResolver {
 

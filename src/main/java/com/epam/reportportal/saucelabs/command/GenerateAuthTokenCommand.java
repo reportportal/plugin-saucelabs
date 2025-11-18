@@ -6,8 +6,8 @@ import static com.epam.reportportal.saucelabs.model.IntegrationParametersNames.U
 import static com.epam.reportportal.saucelabs.utils.ValidationUtils.validateIntegrationParams;
 
 import com.epam.reportportal.extension.PluginCommand;
-import com.epam.reportportal.rules.exception.ReportPortalException;
-import com.epam.ta.reportportal.entity.integration.Integration;
+import com.epam.reportportal.infrastructure.persistence.entity.integration.Integration;
+import com.epam.reportportal.infrastructure.rules.exception.ReportPortalException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;

@@ -16,8 +16,6 @@
 
 package com.epam.reportportal.saucelabs;
 
-import static java.util.stream.Collectors.toList;
-
 import com.epam.reportportal.extension.CommonPluginCommand;
 import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.extension.ReportPortalExtensionPoint;
@@ -28,7 +26,6 @@ import com.epam.reportportal.saucelabs.command.GetLogsCommand;
 import com.epam.reportportal.saucelabs.command.GetRealDeviceJobCommand;
 import com.epam.reportportal.saucelabs.command.GetVirtualDeviceJobCommand;
 import com.epam.reportportal.saucelabs.command.TestConnectionCommand;
-import com.epam.reportportal.saucelabs.model.DataCenter;
 import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -16,7 +16,7 @@
 
 package com.epam.reportportal.saucelabs.model;
 
-import com.epam.ta.reportportal.entity.integration.IntegrationParams;
+import com.epam.reportportal.infrastructure.persistence.entity.integration.IntegrationParams;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
