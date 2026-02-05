@@ -1,6 +1,7 @@
 plugins {
     id "io.spring.dependency-management" version "1.1.7"
     id 'java'
+    id 'com.gradleup.shadow' version '9.3.1'
 }
 
 project.ext {
@@ -18,14 +19,14 @@ apply from: scriptsUrl + '/release-fat.gradle'
 apply from: scriptsUrl + '/signing.gradle'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 }
 
 repositories {
     mavenCentral()
     if (!releaseMode) {
-        maven { url 'https://jitpack.io' }
+        maven { url = 'https://jitpack.io' }
     }
 }
 
@@ -42,6 +43,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // add lombok support
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
@@ -54,6 +56,8 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+assemble.dependsOn shadowJar
 
 generatePomFileForShadowPublication { pom.packaging = "jar" }
 
@@ -71,7 +75,7 @@ jar {
 }
 
 shadowJar {
-    zip64 true
+    zip64 = true
     dependencies {
         include(dependency('com.epam.reportportal:saucelabs:.*'))
         include(dependency('org.apache.httpcomponents.client5:httpclient5:5.4.2'))
@@ -99,5 +103,5 @@ task assemblePlugins(type: Copy) {
 }
 
 wrapper {
-    gradleVersion = '8.10.2'
+    gradleVersion = '9.3.1'
 }
