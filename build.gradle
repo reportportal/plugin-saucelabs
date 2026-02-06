@@ -37,8 +37,8 @@ dependencies {
         implementation 'com.epam.reportportal:service-api'
         annotationProcessor 'com.epam.reportportal:service-api'
     } else {
-        implementation 'com.github.reportportal:service-api:3e34a90'
-        annotationProcessor 'com.github.reportportal:service-api:3e34a90'
+        implementation 'com.github.reportportal:service-api:7044a29'
+        annotationProcessor 'com.github.reportportal:service-api:7044a29'
     }
     implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
