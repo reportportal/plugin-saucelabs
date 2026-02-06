@@ -9,7 +9,7 @@ project.ext {
     dependencyRepos = ["plugin-api", "commons-bom"]
     releaseMode = project.hasProperty("releaseMode")
     pluginID = "saucelabs"
-    pluginsDir = "$buildDir/plugins"
+    pluginsDir = layout.buildDirectory.dir("plugins").get().asFile.path
 }
 
 def scriptsUrl = 'https://raw.githubusercontent.com/reportportal/gradle-scripts/' +
