@@ -1,6 +1,7 @@
 plugins {
     id "io.spring.dependency-management" version "1.1.7"
     id 'java'
+    id 'com.gradleup.shadow' version '9.3.1'
 }
 
 project.ext {
@@ -8,7 +9,7 @@ project.ext {
     dependencyRepos = ["plugin-api", "commons-bom"]
     releaseMode = project.hasProperty("releaseMode")
     pluginID = "saucelabs"
-    pluginsDir = "$buildDir/plugins"
+    pluginsDir = layout.buildDirectory.dir("plugins").get().asFile.path
 }
 
 def scriptsUrl = 'https://raw.githubusercontent.com/reportportal/gradle-scripts/' +
@@ -18,14 +19,14 @@ apply from: scriptsUrl + '/release-fat.gradle'
 apply from: scriptsUrl + '/signing.gradle'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 }
 
 repositories {
     mavenCentral()
     if (!releaseMode) {
-        maven { url 'https://jitpack.io' }
+        maven { url = 'https://jitpack.io' }
     }
 }
 
@@ -36,12 +37,13 @@ dependencies {
         implementation 'com.epam.reportportal:service-api'
         annotationProcessor 'com.epam.reportportal:service-api'
     } else {
-        implementation 'com.github.reportportal:service-api:3e34a90'
-        annotationProcessor 'com.github.reportportal:service-api:3e34a90'
+        implementation 'com.github.reportportal:service-api:7044a29'
+        annotationProcessor 'com.github.reportportal:service-api:7044a29'
     }
     implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // add lombok support
     compileOnly "org.projectlombok:lombok:${lombokVersion}"
@@ -54,6 +56,8 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+assemble.dependsOn shadowJar
 
 generatePomFileForShadowPublication { pom.packaging = "jar" }
 
@@ -71,7 +75,7 @@ jar {
 }
 
 shadowJar {
-    zip64 true
+    zip64 = true
     dependencies {
         include(dependency('com.epam.reportportal:saucelabs:.*'))
         include(dependency('org.apache.httpcomponents.client5:httpclient5:5.4.2'))
@@ -99,5 +103,5 @@ task assemblePlugins(type: Copy) {
 }
 
 wrapper {
-    gradleVersion = '8.10.2'
+    gradleVersion = '9.3.1'
 }
