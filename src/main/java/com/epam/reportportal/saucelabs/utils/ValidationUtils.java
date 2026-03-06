@@ -16,15 +16,15 @@
 
 package com.epam.reportportal.saucelabs.utils;
 
-import static com.epam.reportportal.infrastructure.rules.commons.validation.BusinessRule.expect;
+import static com.epam.reportportal.base.infrastructure.rules.commons.validation.BusinessRule.expect;
 import static com.epam.reportportal.saucelabs.model.Constants.JOB_ID;
 import static com.epam.reportportal.saucelabs.model.IntegrationParametersNames.ACCESS_TOKEN;
 import static com.epam.reportportal.saucelabs.model.IntegrationParametersNames.DATA_CENTER;
 import static com.epam.reportportal.saucelabs.model.IntegrationParametersNames.USERNAME;
 
-import com.epam.reportportal.infrastructure.persistence.commons.Predicates;
-import com.epam.reportportal.infrastructure.persistence.entity.integration.IntegrationParams;
-import com.epam.reportportal.infrastructure.rules.exception.ErrorType;
+import com.epam.reportportal.base.infrastructure.persistence.commons.Predicates;
+import com.epam.reportportal.base.infrastructure.persistence.entity.integration.IntegrationParams;
+import com.epam.reportportal.base.infrastructure.rules.exception.ErrorType;
 import java.util.Map;
 
 /**

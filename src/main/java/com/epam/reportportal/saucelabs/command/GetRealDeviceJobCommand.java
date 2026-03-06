@@ -19,9 +19,9 @@ package com.epam.reportportal.saucelabs.command;
 import static com.epam.reportportal.saucelabs.model.Constants.GET_RDC_JOB;
 
 import com.epam.reportportal.extension.PluginCommand;
-import com.epam.reportportal.infrastructure.persistence.entity.integration.Integration;
-import com.epam.reportportal.infrastructure.rules.exception.ErrorType;
-import com.epam.reportportal.infrastructure.rules.exception.ReportPortalException;
+import com.epam.reportportal.base.infrastructure.persistence.entity.integration.Integration;
+import com.epam.reportportal.base.infrastructure.rules.exception.ErrorType;
+import com.epam.reportportal.base.infrastructure.rules.exception.ReportPortalException;
 import com.epam.reportportal.saucelabs.client.RestClientBuilder;
 import com.epam.reportportal.saucelabs.model.Constants;
 import com.epam.reportportal.saucelabs.model.IntegrationProperties;
