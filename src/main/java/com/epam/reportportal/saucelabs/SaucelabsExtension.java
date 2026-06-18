@@ -16,9 +16,14 @@
 
 package com.epam.reportportal.saucelabs;
 
+import com.epam.reportportal.base.infrastructure.persistence.dao.ProjectRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.ProjectUserRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.organization.OrganizationRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.organization.OrganizationUserRepository;
 import com.epam.reportportal.extension.CommonPluginCommand;
 import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.extension.ReportPortalExtensionPoint;
+import com.epam.reportportal.extension.command.ExtensionCommand;
 import com.epam.reportportal.saucelabs.client.RestClientBuilder;
 import com.epam.reportportal.saucelabs.command.AssetsCommand;
 import com.epam.reportportal.saucelabs.command.GenerateAuthTokenCommand;
@@ -49,13 +54,25 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
 
   private static final String PLUGIN_NAME = "Sauce Labs";
 
-  private final Supplier<Map<String, PluginCommand<?>>> pluginCommandMapping = new MemoizingSupplier<>(
-      this::getCommands);
+  private final Supplier<Map<String, ExtensionCommand<?>>> pluginCommandMapping = new MemoizingSupplier<>(
+      this::buildIntegrationExtensionCommands);
 
   private final Supplier<RestClientBuilder> restClientSupplier;
 
   @Autowired
   private BasicTextEncryptor basicEncryptor;
+
+  @Autowired
+  private ProjectRepository projectRepository;
+
+  @Autowired
+  private OrganizationUserRepository organizationUserRepository;
+
+  @Autowired
+  private OrganizationRepository organizationRepository;
+
+  @Autowired
+  private ProjectUserRepository projectUserRepository;
 
   public SaucelabsExtension() {
     restClientSupplier = new MemoizingSupplier<>(() -> new RestClientBuilder(basicEncryptor));
@@ -75,22 +92,35 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
 
   @Override
   public CommonPluginCommand getCommonCommand(String commandName) {
-    throw new UnsupportedOperationException("Plugin commands are not supported");
+    return null;
   }
 
   @Override
   public PluginCommand getIntegrationCommand(String commandName) {
-    return pluginCommandMapping.get().get(commandName);
+    return null;
   }
 
-  private Map<String, PluginCommand<?>> getCommands() {
-    return ImmutableMap.<String, PluginCommand<?>>builder()
-        .put("logs", new GetLogsCommand(restClientSupplier.get()))
-        .put("jobInfo", new GetVirtualDeviceJobCommand(restClientSupplier.get()))
-        .put("realDeviceJobInfo", new GetRealDeviceJobCommand(restClientSupplier.get()))
-        .put("testConnection", new TestConnectionCommand(restClientSupplier.get()))
-        .put("assets", new AssetsCommand(restClientSupplier.get()))
-        .put("token", new GenerateAuthTokenCommand(basicEncryptor))
+  @Override
+  public Map<String, ExtensionCommand<?>> getIntegrationExtensionCommands() {
+    return pluginCommandMapping.get();
+  }
+
+  private Map<String, ExtensionCommand<?>> buildIntegrationExtensionCommands() {
+    return ImmutableMap.<String, ExtensionCommand<?>>builder()
+        .put("logs", new GetLogsCommand(restClientSupplier.get(), projectRepository,
+            organizationUserRepository, organizationRepository, projectUserRepository))
+        .put("jobInfo", new GetVirtualDeviceJobCommand(restClientSupplier.get(), projectRepository,
+            organizationUserRepository, organizationRepository, projectUserRepository))
+        .put("realDeviceJobInfo",
+            new GetRealDeviceJobCommand(restClientSupplier.get(), projectRepository,
+                organizationUserRepository, organizationRepository, projectUserRepository))
+        .put("testConnection",
+            new TestConnectionCommand(restClientSupplier.get(), projectRepository,
+                organizationUserRepository, organizationRepository, projectUserRepository))
+        .put("assets", new AssetsCommand(restClientSupplier.get(), projectRepository,
+            organizationUserRepository, organizationRepository, projectUserRepository))
+        .put("token", new GenerateAuthTokenCommand(basicEncryptor, projectRepository,
+            organizationUserRepository, organizationRepository, projectUserRepository))
         .build();
 
   }

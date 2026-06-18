@@ -13,7 +13,7 @@ class TestConnectionCommandTest extends BaseCommandTest {
   @DisabledIf("disabled")
   void testConnection() {
     TestConnectionCommand command = new TestConnectionCommand(
-        new RestClientBuilder(basicTextEncryptor));
-    assertTrue(command.executeCommand(INTEGRATION, new HashMap<String, Object>()));
+        new RestClientBuilder(basicTextEncryptor), null, null, null, null);
+    assertTrue(command.executeCommand(INTEGRATION, toCommandRq(new HashMap<>())));
   }
 }
