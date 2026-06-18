@@ -12,8 +12,8 @@ class AssetsCommandTest extends BaseCommandTest {
   @DisabledIf("disabled")
   void getJobAssets() {
     AssetsCommand command = new AssetsCommand(
-        new RestClientBuilder(basicTextEncryptor));
-    Object response = command.executeCommand(INTEGRATION, VDC_COMMAND_PARAMS);
+        new RestClientBuilder(basicTextEncryptor), null, null, null, null);
+    Object response = command.executeCommand(INTEGRATION, toCommandRq(VDC_COMMAND_PARAMS));
 
     assertNotNull(response);
   }

@@ -19,10 +19,15 @@ package com.epam.reportportal.saucelabs.command;
 import static com.epam.reportportal.saucelabs.model.Constants.GET_VDC_JOB_ASSETS;
 import static com.epam.reportportal.saucelabs.model.Constants.JOB_ID;
 
-import com.epam.reportportal.extension.PluginCommand;
+import com.epam.reportportal.api.model.PluginCommandRQ;
+import com.epam.reportportal.base.infrastructure.persistence.dao.ProjectRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.ProjectUserRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.organization.OrganizationRepository;
+import com.epam.reportportal.base.infrastructure.persistence.dao.organization.OrganizationUserRepository;
 import com.epam.reportportal.base.infrastructure.persistence.entity.integration.Integration;
 import com.epam.reportportal.base.infrastructure.rules.exception.ErrorType;
 import com.epam.reportportal.base.infrastructure.rules.exception.ReportPortalException;
+import com.epam.reportportal.extension.command.AbstractExtensionCommand;
 import com.epam.reportportal.saucelabs.client.RestClientBuilder;
 import com.epam.reportportal.saucelabs.model.IntegrationProperties;
 import com.epam.reportportal.saucelabs.utils.ValidationUtils;
@@ -42,18 +47,24 @@ import org.springframework.web.client.RestTemplate;
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
  */
 @Slf4j
-public class AssetsCommand implements PluginCommand<Object> {
+public class AssetsCommand extends AbstractExtensionCommand<Object> {
 
   private final RestClientBuilder restClient;
 
 
-  public AssetsCommand(RestClientBuilder restClient) {
+  public AssetsCommand(RestClientBuilder restClient, ProjectRepository projectRepository,
+      OrganizationUserRepository organizationUserRepository,
+      OrganizationRepository organizationRepository,
+      ProjectUserRepository projectUserRepository) {
+    super(projectRepository, organizationUserRepository, organizationRepository,
+        projectUserRepository);
     this.restClient = restClient;
   }
 
   @SneakyThrows
   @Override
-  public Object executeCommand(Integration integration, Map<String, Object> params) {
+  public Object executeCommand(Integration integration, PluginCommandRQ pluginCommandRq) {
+    Map<String, Object> params = pluginCommandRq.getArguments();
     ValidationUtils.validateIntegrationParams(integration.getParams());
     ValidationUtils.validateJobId(params);
 
