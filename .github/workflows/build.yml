@@ -7,6 +7,7 @@ on:
     branches:
       - master
       - develop
+      - 'rc/**'
     paths-ignore:
       - '.github/**'
       - README.md
@@ -16,10 +17,6 @@ permissions:
   id-token: write
   contents: read
   actions: read
-
-
-env:
-  AWS_REGION: eu-central-1
 
 jobs:
   build:
@@ -55,10 +52,9 @@ jobs:
           path: build/libs/*.jar
           retention-days: 1
 
-
   upload:
     needs: build
-    if: github.ref_name == 'develop' || startsWith(github.ref_name, 'feature/')
+    if: github.ref_name == 'develop' || startsWith(github.ref_name, 'feature/') || startsWith(github.ref_name, 'rc/')
     uses: reportportal/.github/.github/workflows/upload-plugin-artifact.yaml@main
     with:
       plugin_name: ${{ github.event.repository.name }}
