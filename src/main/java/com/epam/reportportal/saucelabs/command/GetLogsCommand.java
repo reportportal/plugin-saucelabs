@@ -34,15 +34,14 @@ import com.epam.reportportal.extension.command.AbstractExtensionCommand;
 import com.epam.reportportal.saucelabs.client.RestClientBuilder;
 import com.epam.reportportal.saucelabs.model.IntegrationProperties;
 import com.epam.reportportal.saucelabs.utils.ValidationUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.util.Map;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
@@ -52,16 +51,19 @@ public class GetLogsCommand extends AbstractExtensionCommand<Object> {
 
   private final RestClientBuilder restClient;
 
-  public GetLogsCommand(RestClientBuilder restClient, ProjectRepository projectRepository,
+  private final JsonMapper jsonMapper;
+
+  public GetLogsCommand(RestClientBuilder restClient, JsonMapper jsonMapper,
+      ProjectRepository projectRepository,
       OrganizationUserRepository organizationUserRepository,
       OrganizationRepository organizationRepository,
       ProjectUserRepository projectUserRepository) {
     super(projectRepository, organizationUserRepository, organizationRepository,
         projectUserRepository);
     this.restClient = restClient;
+    this.jsonMapper = jsonMapper;
   }
 
-  @SneakyThrows
   @Override
   public Object executeCommand(Integration integration, PluginCommandRQ pluginCommandRq) {
     Map<String, Object> params = pluginCommandRq.getArguments();
@@ -70,25 +72,25 @@ public class GetLogsCommand extends AbstractExtensionCommand<Object> {
 
     IntegrationProperties sp = new IntegrationProperties(integration.getParams().getParams());
     sp.setJobId((String) params.get(JOB_ID));
-    RestTemplate restTemplate = restClient.buildRestTemplate(sp);
+    RestClient http = restClient.buildRestClient(sp);
 
     try {
       // check if logs exist
       String assetsUrl = String.format(GET_VDC_JOB_ASSETS, sp.getUsername(), sp.getJobId());
-      String jobAssets = restTemplate.getForObject(assetsUrl, String.class);
+      String jobAssets = http.get().uri(assetsUrl).retrieve().body(String.class);
       JsonObject jsonElement = (JsonObject) JsonParser.parseString(jobAssets);
       if (jsonElement.get(LOG_URL) == null) {
         throw new ReportPortalException(ErrorType.NOT_FOUND, "Logs");
       }
 
       String logsUrl = String.format(GET_VDC_JOB_LOGS, sp.getUsername(), sp.getJobId());
-      return restTemplate.getForObject(logsUrl, Object.class);
+      return http.get().uri(logsUrl).retrieve().body(Object.class);
     } catch (RestClientException httpException) {
       try {
         String realDeviceJobUrl = String.format(GET_RDC_LOGS, sp.getJobId());
-        String jobInfo = restTemplate.getForObject(realDeviceJobUrl, String.class);
+        String jobInfo = http.get().uri(realDeviceJobUrl).retrieve().body(String.class);
 
-        return new ObjectMapper().readValue(jobInfo, Object.class);
+        return jsonMapper.readValue(jobInfo, Object.class);
       } catch (RestClientException rdcException) {
         throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
             StringUtils.normalizeSpace("Failed to retrieve job logs"));

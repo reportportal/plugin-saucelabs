@@ -12,7 +12,7 @@ class GetLogsCommandTest extends BaseCommandTest {
   @DisabledIf("disabled")
   void getVirtualDeviceLogs() {
     GetLogsCommand command = new GetLogsCommand(
-        new RestClientBuilder(basicTextEncryptor), null, null, null, null);
+        new RestClientBuilder(basicTextEncryptor), jsonMapper, null, null, null, null);
     Object response = command.executeCommand(INTEGRATION, toCommandRq(VDC_COMMAND_PARAMS));
 
     assertNotNull(response);

@@ -32,13 +32,12 @@ import com.epam.reportportal.saucelabs.client.RestClientBuilder;
 import com.epam.reportportal.saucelabs.model.Constants;
 import com.epam.reportportal.saucelabs.model.IntegrationProperties;
 import com.epam.reportportal.saucelabs.utils.ValidationUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
@@ -48,7 +47,9 @@ public class GetVirtualDeviceJobCommand extends AbstractExtensionCommand<Object>
 
   private final RestClientBuilder restClient;
 
-  public GetVirtualDeviceJobCommand(RestClientBuilder restClient,
+  private final JsonMapper jsonMapper;
+
+  public GetVirtualDeviceJobCommand(RestClientBuilder restClient, JsonMapper jsonMapper,
       ProjectRepository projectRepository,
       OrganizationUserRepository organizationUserRepository,
       OrganizationRepository organizationRepository,
@@ -56,9 +57,9 @@ public class GetVirtualDeviceJobCommand extends AbstractExtensionCommand<Object>
     super(projectRepository, organizationUserRepository, organizationRepository,
         projectUserRepository);
     this.restClient = restClient;
+    this.jsonMapper = jsonMapper;
   }
 
-  @SneakyThrows
   @Override
   public Object executeCommand(Integration integration, PluginCommandRQ pluginCommandRq) {
     Map<String, Object> params = pluginCommandRq.getArguments();
@@ -67,20 +68,20 @@ public class GetVirtualDeviceJobCommand extends AbstractExtensionCommand<Object>
 
     IntegrationProperties sp = new IntegrationProperties(integration.getParams().getParams());
     sp.setJobId((String) params.get(Constants.JOB_ID));
-    RestTemplate restTemplate = restClient.buildRestTemplate(sp);
+    RestClient http = restClient.buildRestClient(sp);
 
     try {
       String virtualDeviceJobUrl = String.format(GET_VDC_JOB, sp.getUsername(), sp.getJobId());
-      String jobInfo = restTemplate.getForObject(virtualDeviceJobUrl, String.class);
+      String jobInfo = http.get().uri(virtualDeviceJobUrl).retrieve().body(String.class);
 
-      return new ObjectMapper().readValue(jobInfo, Object.class);
+      return jsonMapper.readValue(jobInfo, Object.class);
 
     } catch (RestClientException httpException) {
       try {
         String realDeviceJobUrl = String.format(GET_RDC_JOB, sp.getJobId());
-        String jobInfo = restTemplate.getForObject(realDeviceJobUrl, String.class);
+        String jobInfo = http.get().uri(realDeviceJobUrl).retrieve().body(String.class);
 
-        return new ObjectMapper().readValue(jobInfo, Object.class);
+        return jsonMapper.readValue(jobInfo, Object.class);
       } catch (RestClientException realDeviceException) {
 
         throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
