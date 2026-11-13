@@ -31,9 +31,8 @@ import com.epam.reportportal.saucelabs.client.RestClientBuilder;
 import com.epam.reportportal.saucelabs.model.IntegrationProperties;
 import com.epam.reportportal.saucelabs.utils.ValidationUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
@@ -56,12 +55,11 @@ public class TestConnectionCommand extends AbstractExtensionCommand<Boolean> {
   public Boolean executeCommand(Integration integration, PluginCommandRQ pluginCommandRq) {
     ValidationUtils.validateIntegrationParams(integration.getParams());
     IntegrationProperties sp = new IntegrationProperties(integration.getParams().getParams());
-    RestTemplate restTemplate = restClient.buildRestTemplate(sp);
+    RestClient http = restClient.buildRestClient(sp);
 
     try {
-      String assetsUrl = String.format(TEST_CONNECTION, sp.getUsername());
-      ResponseEntity<String> forObject = restTemplate.exchange(assetsUrl, HttpMethod.GET, null, String.class);
-      if (forObject.getStatusCode().is2xxSuccessful()) {
+      ResponseEntity<Void> response = http.get().uri(TEST_CONNECTION).retrieve().toBodilessEntity();
+      if (response.getStatusCode().is2xxSuccessful()) {
         return true;
       } else {
         throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,

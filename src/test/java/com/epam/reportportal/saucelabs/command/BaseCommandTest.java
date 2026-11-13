@@ -28,6 +28,7 @@ import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 import org.jasypt.util.text.BasicTextEncryptor;
 import org.junit.jupiter.api.BeforeAll;
+import tools.jackson.databind.json.JsonMapper;
 
 // set values in 'integration.properties' to enable the tests
 public abstract class BaseCommandTest {
@@ -40,6 +41,8 @@ public abstract class BaseCommandTest {
   public static final Integration INTEGRATION = new Integration();
 
   BasicTextEncryptor basicTextEncryptor = new BasicTextEncryptor();
+
+  protected final JsonMapper jsonMapper = JsonMapper.builder().build();
 
   @BeforeAll
   protected static void before() {

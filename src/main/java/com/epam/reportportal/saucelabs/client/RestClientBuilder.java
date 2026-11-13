@@ -18,8 +18,7 @@ package com.epam.reportportal.saucelabs.client;
 
 import com.epam.reportportal.saucelabs.model.IntegrationProperties;
 import org.jasypt.util.text.BasicTextEncryptor;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 public class RestClientBuilder {
 
@@ -29,11 +28,10 @@ public class RestClientBuilder {
     this.textEncryptor = textEncryptor;
   }
 
-  public RestTemplate buildRestTemplate(IntegrationProperties sp) {
-
-    return new RestTemplateBuilder()
-        .basicAuthentication(sp.getUsername(), textEncryptor.decrypt(sp.getToken()))
-        .rootUri(sp.getDatacenter().getBaseUrl())
+  public RestClient buildRestClient(IntegrationProperties sp) {
+    return RestClient.builder()
+        .baseUrl(sp.getDatacenter().getBaseUrl())
+        .defaultHeaders(headers -> headers.setBasicAuth(sp.getUsername(), textEncryptor.decrypt(sp.getToken())))
         .build();
   }
 }
