@@ -36,11 +36,15 @@ ext['spring-boot.version'] = "${springBootVersion}"
 
 dependencies {
     if (releaseMode) {
-        implementation 'com.epam.reportportal:service-api'
-        annotationProcessor 'com.epam.reportportal:service-api'
+        implementation "com.epam.reportportal:service-api:${serviceApiVersion}"
+        annotationProcessor("com.epam.reportportal:service-api:${serviceApiVersion}") {
+            exclude group: 'org.springframework.modulith', module: 'spring-modulith-apt'
+        }
     } else {
         implementation 'com.github.reportportal:service-api:73c327819e'
-        annotationProcessor 'com.github.reportportal:service-api:73c327819e'
+        annotationProcessor('com.github.reportportal:service-api:73c327819e') {
+            exclude group: 'org.springframework.modulith', module: 'spring-modulith-apt'
+        }
     }
     implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
