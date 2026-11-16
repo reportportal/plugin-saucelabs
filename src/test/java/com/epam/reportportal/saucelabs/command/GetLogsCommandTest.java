@@ -12,8 +12,8 @@ class GetLogsCommandTest extends BaseCommandTest {
   @DisabledIf("disabled")
   void getVirtualDeviceLogs() {
     GetLogsCommand command = new GetLogsCommand(
-        new RestClientBuilder(basicTextEncryptor));
-    Object response = command.executeCommand(INTEGRATION, VDC_COMMAND_PARAMS);
+        new RestClientBuilder(basicTextEncryptor), null, null, null, null);
+    Object response = command.executeCommand(INTEGRATION, toCommandRq(VDC_COMMAND_PARAMS));
 
     assertNotNull(response);
   }

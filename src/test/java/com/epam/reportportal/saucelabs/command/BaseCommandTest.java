@@ -19,8 +19,9 @@ package com.epam.reportportal.saucelabs.command;
 import static com.epam.reportportal.saucelabs.model.Constants.JOB_ID;
 import static com.epam.reportportal.saucelabs.utils.TestProperties.getTestProperties;
 
-import com.epam.ta.reportportal.entity.integration.Integration;
-import com.epam.ta.reportportal.entity.integration.IntegrationParams;
+import com.epam.reportportal.api.model.PluginCommandRQ;
+import com.epam.reportportal.base.infrastructure.persistence.entity.integration.Integration;
+import com.epam.reportportal.base.infrastructure.persistence.entity.integration.IntegrationParams;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -61,6 +62,10 @@ public abstract class BaseCommandTest {
         .stream()
         .map(String::valueOf)
         .anyMatch(StringUtils::isEmpty);
+  }
+
+  protected static PluginCommandRQ toCommandRq(Map<String, Object> params) {
+    return new PluginCommandRQ(null, params);
   }
 
 }

@@ -20,7 +20,7 @@ package com.epam.reportportal.saucelabs.command;
 import static com.epam.reportportal.saucelabs.model.Constants.JOB_ID;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.epam.reportportal.rules.exception.ReportPortalException;
+import com.epam.reportportal.base.infrastructure.rules.exception.ReportPortalException;
 import com.epam.reportportal.saucelabs.client.RestClientBuilder;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,8 +35,8 @@ public class GetVirtualDeviceJobCommandTest extends BaseCommandTest {
   @DisabledIf("disabled")
   void getVirtualDeviceJob() {
     GetVirtualDeviceJobCommand command = new GetVirtualDeviceJobCommand(
-        new RestClientBuilder(basicTextEncryptor));
-    Object response = command.executeCommand(INTEGRATION, VDC_COMMAND_PARAMS);
+        new RestClientBuilder(basicTextEncryptor), null, null, null, null);
+    Object response = command.executeCommand(INTEGRATION, toCommandRq(VDC_COMMAND_PARAMS));
 
     assertNotNull(response);
   }
@@ -44,8 +44,9 @@ public class GetVirtualDeviceJobCommandTest extends BaseCommandTest {
   @Test
   @DisabledIf("disabled")
   void getVirtualDeviceJobLogs() {
-    GetLogsCommand command = new GetLogsCommand(new RestClientBuilder(basicTextEncryptor));
-    Object response = command.executeCommand(INTEGRATION, VDC_COMMAND_PARAMS);
+    GetLogsCommand command = new GetLogsCommand(new RestClientBuilder(basicTextEncryptor), null,
+        null, null, null);
+    Object response = command.executeCommand(INTEGRATION, toCommandRq(VDC_COMMAND_PARAMS));
 
     assertNotNull(response);
   }
@@ -58,9 +59,10 @@ public class GetVirtualDeviceJobCommandTest extends BaseCommandTest {
 
     BasicTextEncryptor basicTextEncryptor = new BasicTextEncryptor();
 
-    GetLogsCommand command = new GetLogsCommand(new RestClientBuilder(basicTextEncryptor));
+    GetLogsCommand command = new GetLogsCommand(new RestClientBuilder(basicTextEncryptor), null,
+        null, null, null);
     Assertions.assertThrows(ReportPortalException.class,
-        () -> command.executeCommand(INTEGRATION, params));
+        () -> command.executeCommand(INTEGRATION, toCommandRq(params)));
 
   }
 }
