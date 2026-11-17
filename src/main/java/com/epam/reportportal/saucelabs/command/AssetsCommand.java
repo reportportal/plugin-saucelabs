@@ -18,6 +18,7 @@ package com.epam.reportportal.saucelabs.command;
 
 import static com.epam.reportportal.saucelabs.model.Constants.GET_VDC_JOB_ASSETS;
 import static com.epam.reportportal.saucelabs.model.Constants.JOB_ID;
+import static com.epam.reportportal.saucelabs.model.Constants.LOG_URL;
 
 import com.epam.reportportal.api.model.PluginCommandRQ;
 import com.epam.reportportal.base.infrastructure.persistence.dao.ProjectRepository;
@@ -25,23 +26,19 @@ import com.epam.reportportal.base.infrastructure.persistence.dao.ProjectUserRepo
 import com.epam.reportportal.base.infrastructure.persistence.dao.organization.OrganizationRepository;
 import com.epam.reportportal.base.infrastructure.persistence.dao.organization.OrganizationUserRepository;
 import com.epam.reportportal.base.infrastructure.persistence.entity.integration.Integration;
-import com.epam.reportportal.base.infrastructure.rules.exception.ErrorType;
-import com.epam.reportportal.base.infrastructure.rules.exception.ReportPortalException;
 import com.epam.reportportal.extension.command.AbstractExtensionCommand;
 import com.epam.reportportal.saucelabs.client.RestClientBuilder;
 import com.epam.reportportal.saucelabs.model.IntegrationProperties;
 import com.epam.reportportal.saucelabs.utils.ValidationUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.jooq.tools.json.JSONArray;
-import org.jooq.tools.json.JSONObject;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
@@ -51,17 +48,19 @@ public class AssetsCommand extends AbstractExtensionCommand<Object> {
 
   private final RestClientBuilder restClient;
 
+  private final JsonMapper jsonMapper;
 
-  public AssetsCommand(RestClientBuilder restClient, ProjectRepository projectRepository,
+  public AssetsCommand(RestClientBuilder restClient, JsonMapper jsonMapper,
+      ProjectRepository projectRepository,
       OrganizationUserRepository organizationUserRepository,
       OrganizationRepository organizationRepository,
       ProjectUserRepository projectUserRepository) {
     super(projectRepository, organizationUserRepository, organizationRepository,
         projectUserRepository);
     this.restClient = restClient;
+    this.jsonMapper = jsonMapper;
   }
 
-  @SneakyThrows
   @Override
   public Object executeCommand(Integration integration, PluginCommandRQ pluginCommandRq) {
     Map<String, Object> params = pluginCommandRq.getArguments();
@@ -70,31 +69,24 @@ public class AssetsCommand extends AbstractExtensionCommand<Object> {
 
     IntegrationProperties sp = new IntegrationProperties(integration.getParams().getParams());
     sp.setJobId((String) params.get(JOB_ID));
-    RestTemplate restTemplate = restClient.buildRestTemplate(sp);
+    RestClient http = restClient.buildRestClient(sp);
 
     try {
       String assetsUrl = String.format(GET_VDC_JOB_ASSETS, sp.getUsername(), sp.getJobId());
-      String jobAssets = restTemplate.getForObject(assetsUrl, String.class);
+      String jobAssets = http.get().uri(assetsUrl).retrieve().body(String.class);
 
       JsonObject jsonElement = (JsonObject) JsonParser.parseString(jobAssets);
       jsonElement.addProperty("assetsPrefix", sp.getDatacenter().getBaseUrl() + assetsUrl);
 
-      return new ObjectMapper().readValue(jsonElement.toString(), Object.class); // try skip mapping
+      return jsonMapper.readValue(jsonElement.toString(), Object.class); // try skip mapping
 
-    } catch (RestClientException httpException) {
-      try {
-        JSONObject response = new JSONObject();
-        response.put("assetsPrefix",
-            String.format("%s/v1/rdc/jobs/%s/", sp.getDatacenter().getBaseUrl(), sp.getJobId()));
-        response.put("screenshots", new JSONArray());
-        response.put("sauce-log",
-            String.format("%s/v1/rdc/jobs/%s/deviceLogs", sp.getDatacenter().getBaseUrl(),
-                sp.getJobId()));
-        return new ObjectMapper().readValue(response.toString(), Object.class);
-      } catch (Exception httpException2) {
-        throw new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION,
-            StringUtils.normalizeSpace("Failed to retrieve job assets"));
-      }
+    } catch (RestClientException _) {
+      String rdcJobUrl = String.format("%s/v1/rdc/jobs/%s", sp.getDatacenter().getBaseUrl(), sp.getJobId());
+      Map<String, Object> response = new LinkedHashMap<>();
+      response.put("assetsPrefix", rdcJobUrl + "/");
+      response.put("screenshots", List.of());
+      response.put(LOG_URL, rdcJobUrl + "/deviceLogs");
+      return response;
     }
   }
 

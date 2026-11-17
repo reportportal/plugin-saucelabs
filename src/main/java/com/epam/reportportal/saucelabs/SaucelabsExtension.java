@@ -40,6 +40,7 @@ import java.util.function.Supplier;
 import org.jasypt.util.text.BasicTextEncryptor;
 import org.pf4j.Extension;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author <a href="mailto:pavel_bortnik@epam.com">Pavel Bortnik</a>
@@ -59,8 +60,13 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
 
   private final Supplier<RestClientBuilder> restClientSupplier;
 
+  private final Supplier<JsonMapper> jsonMapperSupplier;
+
   @Autowired
   private BasicTextEncryptor basicEncryptor;
+
+  @Autowired
+  private JsonMapper jsonMapper;
 
   @Autowired
   private ProjectRepository projectRepository;
@@ -76,6 +82,7 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
 
   public SaucelabsExtension() {
     restClientSupplier = new MemoizingSupplier<>(() -> new RestClientBuilder(basicEncryptor));
+    jsonMapperSupplier = new MemoizingSupplier<>(() -> jsonMapper);
   }
 
 
@@ -90,11 +97,14 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
     return params;
   }
 
+  // TODO: remove both overrides once service-api drops the deprecated abstract methods
+  @Deprecated
   @Override
   public CommonPluginCommand getCommonCommand(String commandName) {
     return null;
   }
 
+  @Deprecated
   @Override
   public PluginCommand getIntegrationCommand(String commandName) {
     return null;
@@ -107,18 +117,22 @@ public class SaucelabsExtension implements ReportPortalExtensionPoint {
 
   private Map<String, ExtensionCommand<?>> buildIntegrationExtensionCommands() {
     return ImmutableMap.<String, ExtensionCommand<?>>builder()
-        .put("logs", new GetLogsCommand(restClientSupplier.get(), projectRepository,
-            organizationUserRepository, organizationRepository, projectUserRepository))
-        .put("jobInfo", new GetVirtualDeviceJobCommand(restClientSupplier.get(), projectRepository,
-            organizationUserRepository, organizationRepository, projectUserRepository))
+        .put("logs", new GetLogsCommand(restClientSupplier.get(), jsonMapperSupplier.get(),
+            projectRepository, organizationUserRepository, organizationRepository,
+            projectUserRepository))
+        .put("jobInfo", new GetVirtualDeviceJobCommand(restClientSupplier.get(),
+            jsonMapperSupplier.get(), projectRepository, organizationUserRepository,
+            organizationRepository, projectUserRepository))
         .put("realDeviceJobInfo",
-            new GetRealDeviceJobCommand(restClientSupplier.get(), projectRepository,
-                organizationUserRepository, organizationRepository, projectUserRepository))
+            new GetRealDeviceJobCommand(restClientSupplier.get(), jsonMapperSupplier.get(),
+                projectRepository, organizationUserRepository, organizationRepository,
+                projectUserRepository))
         .put("testConnection",
             new TestConnectionCommand(restClientSupplier.get(), projectRepository,
                 organizationUserRepository, organizationRepository, projectUserRepository))
-        .put("assets", new AssetsCommand(restClientSupplier.get(), projectRepository,
-            organizationUserRepository, organizationRepository, projectUserRepository))
+        .put("assets", new AssetsCommand(restClientSupplier.get(), jsonMapperSupplier.get(),
+            projectRepository, organizationUserRepository, organizationRepository,
+            projectUserRepository))
         .put("token", new GenerateAuthTokenCommand(basicEncryptor, projectRepository,
             organizationUserRepository, organizationRepository, projectUserRepository))
         .build();

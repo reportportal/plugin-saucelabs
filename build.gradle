@@ -1,8 +1,7 @@
 plugins {
-    id "io.spring.dependency-management" version "1.1.7"
     id 'java'
-    id 'com.gradleup.shadow' version '9.3.1'
-    id("io.freefair.lombok") version "9.5.0"
+    id 'com.gradleup.shadow' version '9.6.1'
+    id("io.freefair.lombok") version "9.8.2"
 }
 
 project.ext {
@@ -32,21 +31,24 @@ repositories {
     }
 }
 
-ext['spring-boot.version'] = "${springBootVersion}"
-
 dependencies {
     if (releaseMode) {
         implementation 'com.epam.reportportal:service-api'
-        annotationProcessor 'com.epam.reportportal:service-api'
+        annotationProcessor('com.epam.reportportal:service-api') {
+            exclude group: 'org.springframework.modulith', module: 'spring-modulith-apt'
+        }
     } else {
-        implementation 'com.github.reportportal:service-api:73c327819e'
-        annotationProcessor 'com.github.reportportal:service-api:73c327819e'
+        implementation 'com.github.reportportal:service-api:d4b2f7c'
+        annotationProcessor('com.github.reportportal:service-api:d4b2f7c') {
+            exclude group: 'org.springframework.modulith', module: 'spring-modulith-apt'
+        }
     }
-    implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
-    testImplementation 'org.junit.jupiter:junit-jupiter-api'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+    compileOnly 'tools.jackson.core:jackson-databind'
+
+    testImplementation 'tools.jackson.core:jackson-databind'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 test {
@@ -78,8 +80,8 @@ shadowJar {
     }
 }
 
-task plugin(type: Jar) {
-    getArchiveBaseName().set("plugin-${pluginId}")
+def pluginZip = tasks.register('plugin', Jar) {
+    archiveBaseName.set("plugin-${pluginId}")
     into('classes') {
         with jar
     }
@@ -89,12 +91,12 @@ task plugin(type: Jar) {
     archiveExtension.set('zip')
 }
 
-task assemblePlugin(type: Copy) {
-    from plugin
+tasks.register('assemblePlugin', Copy) {
+    from pluginZip
     into pluginsDir
 }
 
-task assemblePlugins(type: Copy) {
+tasks.register('assemblePlugins', Copy) {
     dependsOn subprojects.assemblePlugin
 }
 

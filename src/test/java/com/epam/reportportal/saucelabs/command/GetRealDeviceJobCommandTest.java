@@ -12,7 +12,7 @@ class GetRealDeviceJobCommandTest extends BaseCommandTest {
   @DisabledIf("disabled")
   void getRealDeviceJob() {
     GetRealDeviceJobCommand command = new GetRealDeviceJobCommand(
-        new RestClientBuilder(basicTextEncryptor), null, null, null, null);
+        new RestClientBuilder(basicTextEncryptor), jsonMapper, null, null, null, null);
     Object response = command.executeCommand(INTEGRATION, toCommandRq(RDC_COMMAND_PARAMS));
 
     assertNotNull(response);
