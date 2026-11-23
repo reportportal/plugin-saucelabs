@@ -8,7 +8,7 @@ project.ext {
     publishRepo = "https://maven.pkg.github.com/reportportal/plugin-saucelabs"
     dependencyRepos = ["plugin-api", "commons-bom"]
     releaseMode = project.hasProperty("releaseMode")
-    pluginID = "saucelabs"
+    pluginID = "plugin-other-saucelabs"
     pluginsDir = layout.buildDirectory.dir("plugins").get().asFile.path
 }
 
