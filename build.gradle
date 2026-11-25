@@ -8,7 +8,7 @@ project.ext {
     publishRepo = "https://maven.pkg.github.com/reportportal/plugin-saucelabs"
     dependencyRepos = ["plugin-api", "commons-bom"]
     releaseMode = project.hasProperty("releaseMode")
-    pluginID = "saucelabs"
+    pluginID = "plugin-other-saucelabs"
     pluginsDir = layout.buildDirectory.dir("plugins").get().asFile.path
 }
 
@@ -72,7 +72,31 @@ jar {
     }
 }
 
+tasks.register('generateMarketplaceManifest') {
+    def outputDir = layout.buildDirectory.dir('generated/marketplace')
+    def manifest = [
+            id           : pluginId.toString().trim(),
+            name         : 'Sauce Labs',
+            version      : project.version.toString(),
+            description  : 'Watch Sauce Labs test execution videos and logs right in ReportPortal.',
+            author       : [name: 'EPAM ReportPortal', email: 'support@reportportal.io'],
+            license      : 'Apache-2.0',
+            category     : 'other',
+            compatibility: [reportportal: '>=25.1'],
+            homepage     : 'https://github.com/reportportal/plugin-saucelabs',
+            access       : 'public',
+    ]
+    inputs.property('manifest', manifest)
+    outputs.dir(outputDir)
+    doLast {
+        def file = outputDir.get().file('marketplace-manifest.json').asFile
+        file.parentFile.mkdirs()
+        file.setText(groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(manifest)) + '\n', 'UTF-8')
+    }
+}
+
 shadowJar {
+    from(tasks.named('generateMarketplaceManifest'))
     zip64 = true
     dependencies {
         include(dependency('com.epam.reportportal:saucelabs:.*'))
